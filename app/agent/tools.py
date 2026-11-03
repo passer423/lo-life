@@ -26,6 +26,7 @@ from app import bridge, db
 from app.config import AppSettings, settings as default_settings
 from app.domain import body as body_mod
 from app.domain import care, garment, newarrivals as na, shops as shop_table, size
+from app.services import catalog_store
 
 logger = logging.getLogger(__name__)
 
@@ -143,6 +144,18 @@ def _entry_text(item: dict) -> str:
         parts.append("来源 " + str(item["source"])[:90])
     if item.get("sample"):
         parts.append("示例数据")
+    catalog = item.get("catalog")
+    if catalog:
+        bits = ["档案 Lolibrary"]
+        if catalog.get("release_year"):
+            bits.append(f"发售年份 {catalog['release_year']}")
+        if catalog.get("original_price"):
+            bits.append(f"历史原价 {catalog['original_price']}")
+        if catalog.get("archived_at"):
+            bits.append(f"收录 {catalog['archived_at']}")
+        if catalog.get("url"):
+            bits.append(str(catalog["url"]))
+        parts.append("｜".join(bits))
     return _clip("｜".join(parts))
 
 
@@ -152,6 +165,7 @@ def _search_feed(args: SearchFeedArgs, ctx: Context) -> dict:
         return {"ok": True, "empty": True, "summary": "内容里一条上新都没有。", "evidence": []}
 
     shops, _ = shop_table.load_shops(ctx.settings.shops_dir)
+    catalog_index = catalog_store.index(ctx.settings)
     # 先取宽一点再按风格/款式二次筛选，否则 limit 会在筛选之前就把候选砍掉
     items = na.feed(
         entries,
@@ -163,6 +177,7 @@ def _search_feed(args: SearchFeedArgs, ctx: Context) -> dict:
         price_min=args.price_min,
         price_max=args.price_max,
         shops=shops,
+        catalog=catalog_index,
     )
     if args.styles:
         items = [item for item in items if set(args.styles) & set(item.get("styles") or [])]

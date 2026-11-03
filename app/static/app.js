@@ -560,6 +560,15 @@ function arrivalCard(item, charts, shops) {
   const knowledge = item.knowledge && item.knowledge.title
     ? '<div class="kn">相关知识：' + esc(item.knowledge.title) + '</div>'
     : '';
+  // 档案层：Lolibrary 只说"这件是什么"，不冒充当前售价/购买链接
+  const catalogUrl = item.catalog ? safeUrl(item.catalog.url, false) : '';
+  const catalog = item.catalog && catalogUrl
+    ? '<div class="kn">档案：<a href="' + esc(catalogUrl) + '" target="_blank" rel="noopener noreferrer">' +
+        esc(item.catalog.title || 'Lolibrary 条目') + '</a>' +
+        (item.catalog.release_year ? ' · ' + esc(item.catalog.release_year) : '') +
+        (item.catalog.original_price ? ' · 原价 ' + esc(item.catalog.original_price) : '') +
+      '</div>'
+    : '';
   // 未登录时不渲染操作按钮，直接引导去登录——点了才弹 401 是更差的体验
   const shopAction = state.user
     ? '<button class="ghost sm" data-shop-brand="' + esc(item.brand) +
@@ -586,6 +595,7 @@ function arrivalCard(item, charts, shops) {
       reasons +
       matched +
       knowledge +
+      catalog +
       (itemTags || styleTags ? '<div class="tags">' + itemTags + styleTags + '</div>' : '') +
       (item.note ? '<div class="note">' + esc(item.note) + '</div>' : '') +
       '<div class="actions">' +

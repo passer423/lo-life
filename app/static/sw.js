@@ -11,7 +11,7 @@
 // 版本号必须跟着前端资源一起改。Service Worker 对静态资源是 cache-first，
 // 改完 index.html / app.js / style.css 却不改这里，用户会一直看到旧的页面外壳
 // ——这个坑很隐蔽：服务端明明是新代码，浏览器里却是旧的。
-const CACHE = 'lo-life-v23';
+const CACHE = 'lo-life-v24';
 const SHELL = [
   '/',
   '/app.js',

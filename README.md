@@ -97,6 +97,7 @@ lo-life/
 │   ├── kbindex/           知识库索引（可重建）
 │   ├── media/             图片（上传的 + 取图脚本下载的）
 │   ├── ingest/            离线入库：raw / drafts / rejected / runs.jsonl
+│   ├── lolibrary/         Lolibrary 档案缓存（catalog.jsonl，可重建）
 │   └── app.db             账号、关注、偏好
 ├── scripts/
 │   ├── ingest_kb.py       md → posts.jsonl（喂给上游）
@@ -105,6 +106,7 @@ lo-life/
 │   ├── fetch_sizes.py     ★ 从官方商品页抓商品级实测尺寸（默认 dry-run）
 │   ├── scan_baby.py       ★ Baby 官网 products.json → 待确认草稿（默认 dry-run）
 │   ├── ingest_newarrivals.py ★ 任意页面 → 草稿 → 人工审批（模型可跳过）
+│   ├── import_lolibrary.py ★ Lolibrary 档案 → data/lolibrary/catalog.jsonl
 │   ├── make_icons.py      生成 PWA 图标
 │   └── smoke.py           端到端冒烟（对运行中的服务）
 └── tests/                 pytest（上新 / 搜索 / 取图 / 尺码 / 洗护 / 数据层 / 接口）
@@ -262,6 +264,23 @@ price_min / price_max   按解析出的区间过滤
 
 写回时有一条限制：**只在条目 `price_range` 为空时才填**。手录的价格可能是代购价、
 定金价，不该被官网原价悄悄顶掉。
+
+### Lolibrary 档案层：只做“这件是什么”
+
+推荐页的**在售数据仍以官网为准**；Lolibrary 只做身份/档案层，补品牌、分类、商品编号、
+发售年份、历史原价、图片和档案链接。它没有当前售价、库存和购买链接，所以**不覆盖**
+条目的 `price_range` / `link`。
+
+```bash
+python scripts/import_lolibrary.py --pages 1 --limit 24          # dry-run
+python scripts/import_lolibrary.py --pages 1 --limit 24 --write  # 写档案缓存
+```
+
+- 缓存：`data/lolibrary/catalog.jsonl`（第三方档案，不进 git，可重建）；
+- 匹配顺序：**商品编号**（AP 的 `pid`、Baby 的 Shopify handle）→ 归一化标题 → 品牌+标题；
+- 匹配到就在卡片上挂一行「档案：Lolibrary 条目 · 发售年份 · 历史原价」，匹配不到不显示；
+- `archived_at` 是**收录日期**，不是发售日期；价格是“Originally listed for”的历史原价，不是现价；
+- 首轮只抓一页（24 条），覆盖会随着 `--pages` / `--limit` 逐步扩大。
 
 ### 尺码在列表里怎么显示
 
@@ -762,7 +781,7 @@ zip 里是 `app.db`（用 SQLite 的 `backup()` 复制，不是直接拷文件�
 
 ```bash
 python -m pip install -r requirements-dev.txt
-python -m pytest -q            # 462 项：认证 / 偏好轴 / 上新 / 搜索排序 / 推荐 / 价格 / 取图 / 尺码 / 洗护 / 草稿 / agent / 数据层 / 接口
+python -m pytest -q            # 472 项：认证 / 偏好轴 / 上新 / 搜索排序 / 推荐 / 价格 / 取图 / 尺码 / 洗护 / 草稿 / 档案 / agent / 数据层 / 接口
 python scripts/smoke.py        # 63 项端到端，需要服务在跑
 ```
 

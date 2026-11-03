@@ -127,6 +127,16 @@ class AppSettings(BaseSettings):
         return self.data_dir / "kbindex"
 
     @property
+    def lolibrary_dir(self) -> Path:
+        """Lolibrary 档案缓存的家（第三方档案，不进 git、可重建）。"""
+        return self.data_dir / "lolibrary"
+
+    @property
+    def lolibrary_catalog_path(self) -> Path:
+        """档案索引（JSONL，一行一个条目）。"""
+        return self.lolibrary_dir / "catalog.jsonl"
+
+    @property
     def llm_enabled(self) -> bool:
         return bool(self.llm_api_key.strip())
 

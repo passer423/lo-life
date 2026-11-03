@@ -28,6 +28,7 @@ from app.domain import newarrivals as na
 from app.domain import preferences as pref
 from app.domain import recommend as rec
 from app.domain import shops as shop_table
+from app.services import catalog_store
 from app.domain import size
 from app.domain.axes import AXES
 
@@ -111,6 +112,7 @@ def get_feed(
     options = pref.build_options(entries)
     charts, chart_problems = _size_charts(entries)
     shops, shop_problems = shop_table.load_shops(settings.shops_dir)
+    catalog_index = catalog_store.index(settings)
 
     items = na.feed(
         entries,
@@ -123,6 +125,7 @@ def get_feed(
         price_min=price_min,
         price_max=price_max,
         shops=shops,
+        catalog=catalog_index,
     )
     return {
         "items": items,
@@ -322,7 +325,10 @@ def get_recommendations(
 
     # 先按 200 条取全量再筛、再截断：反过来先截断会把"命中偏好但排在 21 名之后"
     # 的条目直接丢掉，而它们恰恰可能是用户要看的。
-    ranked = na.feed(entries, preferences=preferences, sort=sort, limit=200)
+    catalog_index = catalog_store.index(settings)
+    ranked = na.feed(
+        entries, preferences=preferences, sort=sort, limit=200, catalog=catalog_index
+    )
     by_id = {entry.id: entry for entry in entries}
 
     items: list[dict] = []

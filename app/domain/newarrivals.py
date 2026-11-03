@@ -23,6 +23,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Iterable
 
+from app.domain import catalog as catalog_domain
 from app.domain import images, price, shops as shop_table, urls
 from app.domain.axes import AXES, entry_haystack
 
@@ -190,6 +191,7 @@ def feed(
     price_min: float | None = None,
     price_max: float | None = None,
     shops: dict[str, shop_table.Shop] | None = None,
+    catalog: dict | None = None,
 ) -> list[dict]:
     """排序并序列化。
 
@@ -263,8 +265,7 @@ def feed(
         # 条目自己没写 link 时退到店铺首页（见 shops.link_for 的说明）
         link, link_kind = shop_table.link_for(entry.brand, entry.link, shops or {})
 
-        rows.append(
-            {
+        row = {
                 "id": entry.id,
                 "brand": entry.brand,
                 "brand_name": entry.brand_name,
@@ -301,7 +302,10 @@ def feed(
                 "reasons": reasons,
                 "matched": matched,
             }
-        )
+        # 档案层只补"这件是什么"；匹配不到就不加字段，绝不影响当前价格/链接。
+        if catalog:
+            row["catalog"] = catalog_domain.match_entry(entry, catalog)
+        rows.append(row)
 
     if sort == "score":
         # 分数高的在前；同分时越新越靠前（age_days 升序）；再同则按 id 稳定排序
