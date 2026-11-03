@@ -367,11 +367,15 @@ const FEED_SORTS = [
   ['price_desc', '价格 ↓'],
 ];
 
-/* 三围存在**浏览器**里，不进服务端数据库。
-   理由：这是本应用最私人的几个数字，而"记住它"只是为了免去每次重填。
-   放 localStorage 的好处是——清除它不需要接口、删号不需要级联、备份 zip 里也不会多出
-   一份身体数据；代价是换设备要重填（对一个人自用的场景，这个代价可以接受）。 */
+/* 身材数据：**登录后服务端是权威来源**，localStorage 只是它的本机缓存。
+   早先只存浏览器，导致「我的」页填完六项后尺码页仍要重填、列表也不出「你的码」——
+   同一份数据两套存储互不相认。现在的规则：
+   - 启动/登录后从 /api/profile/body 拉一次，把四个围度镜像到 localStorage；
+   - 未登录时只有 localStorage（算尺码本来就不需要登录）；
+   - 保存时登录用户同时写服务端（部分更新，只动围度，不会碰「我的」页里的身高体重）。
+   缓存放在 localStorage 是为了让 getMeasurements() 保持同步——列表渲染路径不该变成 async。 */
 const MEASURE_KEY = 'lo-life-measure';
+const MEASURE_KEYS = ['bust', 'waist', 'hip', 'shoulder'];
 
 function getMeasurements() {
   try {
@@ -381,11 +385,39 @@ function getMeasurements() {
   } catch (_) { return null; }
 }
 
-function setMeasurements(value) {
+function writeLocalMeasurements(value) {
   try {
     if (value) localStorage.setItem(MEASURE_KEY, JSON.stringify(value));
     else localStorage.removeItem(MEASURE_KEY);
   } catch (_) { /* 隐私模式下写不了：降级为"这次会话不记住" */ }
+}
+
+function setMeasurements(value) {
+  writeLocalMeasurements(value);
+  if (!getToken()) return;
+  // 服务端是部分更新语义：只提交**这次真的填了**的围度。
+  // 不把没填的项写成 null——那会把用户在「我的」页填过的臀围/肩宽一起清掉。
+  const payload = {};
+  if (value) {
+    MEASURE_KEYS.forEach((key) => { if (value[key] != null) payload[key] = value[key]; });
+    if (!Object.keys(payload).length) return;
+  } else {
+    MEASURE_KEYS.forEach((key) => { payload[key] = null; });
+  }
+  request('/api/profile/body', { method: 'PUT', body: payload })
+    .catch(() => { /* 写失败不回滚本地：下次启动会用服务端值重新对齐 */ });
+}
+
+async function syncMeasurementsFromServer() {
+  if (!getToken()) return;
+  try {
+    const data = await request('/api/profile/body');
+    const body = (data && data.body) || {};
+    const usable = {};
+    MEASURE_KEYS.forEach((key) => { if (body[key] != null) usable[key] = body[key]; });
+    // 服务端没有记录（新账号）时保留本地值；有记录就以服务端为准（含"只填了身高体重"）。
+    if (data && data.filled) writeLocalMeasurements(usable);
+  } catch (_) { /* 未登录 / 网络失败都回退到本地缓存 */ }
 }
 
 function feedQuery() {
@@ -973,15 +1005,16 @@ RENDERERS.size = async function renderSize() {
   const dims = document.getElementById('size-dims');
   const meta = document.getElementById('size-meta');
 
-  /* 记住的尺寸只存在这个浏览器里（localStorage），不上服务端。
-     所以这里必须给一个**看得见的清除入口**——否则用户永远不知道
-     "它记住了什么、存在哪、怎么删"。 */
+  /* 记住的尺寸：未登录时只在本浏览器（localStorage）；登录后会同步到账号，
+     换设备也能用。无论哪种情况，这里都必须有**看得见的清除入口**——
+     否则用户永远不知道"它记住了什么、存在哪、怎么删"。 */
   function drawRemember() {
     const box = document.getElementById('size-remember');
     const stored = getMeasurements();
     if (!stored || !Object.keys(stored).length) {
-      box.innerHTML = '<div class="notice info">算过之后可以把尺寸记在这个浏览器里，' +
-        '推荐页会直接标出你的码。服务端不保存。</div>';
+      box.innerHTML = '<div class="notice info">算过之后可以记住尺寸，推荐页会直接标出你的码。' +
+        (getToken() ? '登录状态下会同步到账号（只存围度，不含身高体重）。' : '未登录时只存在这个浏览器里。') +
+        '</div>';
       return;
     }
     const text = Object.keys(stored)
@@ -1169,6 +1202,7 @@ function wireAuth() {
       });
       setToken(data.token);
       state.user = data.user;
+      await syncMeasurementsFromServer();
       toast(mode === 'register'
         ? (data.claimed_follows ? '注册成功，已接手 ' + data.claimed_follows + ' 条旧关注' : '注册成功')
         : '登录成功');
@@ -1223,7 +1257,10 @@ RENDERERS.me = async function renderMe() {
     '</div></div>' +
     '<div class="card"><h2>备份</h2>' +
       '<p class="hint">导出包含账号、偏好、知识库、尺码表、洗护规则与全部上新条目，可独立恢复。</p>' +
-      '<button class="primary" id="export">导出备份 zip</button></div>' +
+      (state.user
+        ? '<button class="primary" id="export">导出备份 zip</button>'
+        : '<p class="hint">登录后才能导出：备份包里含有账号数据。</p>') +
+      '</div>' +
     '<div class="card"><h2>状态</h2><div class="status">' +
       '服务版本：' + esc(health ? health.version : '未知') + '<br>' +
       '账号数：' + esc(health ? health.users : 0) + '<br>' +
@@ -1246,6 +1283,8 @@ RENDERERS.me = async function renderMe() {
         try { await request('/api/auth/logout', { method: 'POST' }); } catch (_) { /* 令牌已失效也无所谓 */ }
         setToken('');
         state.user = null;
+        // 本机缓存跟着账号走：不留在浏览器里，避免下一个登录的账号继承上一个人的围度
+        writeLocalMeasurements(null);
         toast('已退出登录');
         await RENDERERS.me();
       });
@@ -1258,6 +1297,7 @@ RENDERERS.me = async function renderMe() {
           await request('/api/auth/me', { method: 'DELETE' });
           setToken('');
           state.user = null;
+          writeLocalMeasurements(null);
           toast('账号已删除');
           await RENDERERS.me();
         } catch (error) {
@@ -1269,10 +1309,51 @@ RENDERERS.me = async function renderMe() {
     wireAuth();
   }
 
-  document.getElementById('export').addEventListener('click', () => {
-    window.location.href = '/api/export';
-    toast('正在打包…');
-  });
+  /* 导出必须带 Authorization：接口已要求登录。不能用 location.href——
+     那样是浏览器直接跳转，发不出 Bearer 头。改成 fetch + blob + 临时 <a download>。 */
+  const exportButton = document.getElementById('export');
+  if (exportButton) {
+    exportButton.addEventListener('click', async (event) => {
+      const button = event.currentTarget;
+      button.disabled = true;
+      toast('正在打包…');
+      try {
+        const token = getToken();
+        const response = await fetch('/api/export', {
+          headers: token ? { Authorization: 'Bearer ' + token } : {},
+        });
+        if (!response.ok) {
+          let detail = response.status + ' ' + response.statusText;
+          try {
+            const data = await response.json();
+            if (data && data.detail) detail = data.detail;
+          } catch (_) { /* 非 JSON 错误体 */ }
+          if (response.status === 401) {
+            setToken('');
+            state.user = null;
+          }
+          throw new Error(detail);
+        }
+        const blob = await response.blob();
+        const disposition = response.headers.get('Content-Disposition') || '';
+        const matched = /filename="?([^";]+)"?/.exec(disposition);
+        const name = matched ? matched[1] : 'lo-life-backup.zip';
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = name;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        toast('备份已开始下载');
+      } catch (error) {
+        toast('导出失败：' + error.message);
+      } finally {
+        button.disabled = false;
+      }
+    });
+  }
 };
 
 /* ------------------------------------------------------------------ 启动 */
@@ -1297,6 +1378,8 @@ if ('serviceWorker' in navigator) {
 // 反过来的话「我的」会先闪一下登录表单，然后才变成已登录状态。
 (async function boot() {
   await refreshUser();
+  // 先对齐围度再渲染：否则首屏列表会拿本地旧值算码，登录用户的「你的码」会闪一下才变
+  await syncMeasurementsFromServer();
   route();
   ping();
 })();

@@ -1,7 +1,21 @@
-# 应用层只新增 Web/上传相关；检索与生成全部复用上游 lolita-rag 的依赖
-# （上游要求见 lolita-rag/requirements.txt，本机已装好）
-fastapi>=0.110
-uvicorn>=0.27
+# 应用层依赖。检索与生成复用上游 lolita-rag 的代码与依赖——上游仓库必须存在，
+# 并额外安装它自己的依赖：
+#   pip install -r <LOLITA_RAG_ROOT>/requirements.txt
+# （那一份包含 jieba / rank-bm25 / numpy / sentence-transformers / chromadb 等；
+#   复制到这里会让"上游更新"和"本仓依赖"分叉，所以只声明本仓**直接 import** 的东西。）
+
+# ---------- Web / 上传 ----------
+fastapi>=0.110,<1.0
+uvicorn>=0.27,<1.0
 python-multipart>=0.0.9
-pydantic>=2.0
-pydantic-settings>=2.0
+pydantic>=2.0,<3.0
+pydantic-settings>=2.0,<3.0
+
+# ---------- 模型接入 ----------
+# app/agent/planner.py、writer.py、services/ingest_extract.py 里运行时导入；
+# 不写在这里，首次问答会 503，且没有任何提示指向"缺包"。
+openai>=1.12.0,<3.0
+
+# ---------- 取图 ----------
+# imagefetch.py 显式用 certifi 的 CA bundle（这台机器的 Anaconda 默认证书路径是坏的）。
+certifi>=2023.7.22

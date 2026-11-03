@@ -476,8 +476,18 @@ def test_chat_reports_model_failure_as_502(client, monkeypatch):
     assert "模型调用失败" in response.json()["detail"]
 
 
+def test_runs_requires_login(client):
+    """轨迹里是完整的原始问题与回答，匿名不能读。"""
+    assert client.get("/api/chat/runs").status_code == 401
+
+
 def test_runs_endpoint(client):
-    payload = client.get("/api/chat/runs", params={"limit": 5}).json()
+    token = client.post(
+        "/api/auth/register", json={"username": "runs-tester", "password": "password123"}
+    ).json()["token"]
+    payload = client.get(
+        "/api/chat/runs", params={"limit": 5}, headers={"Authorization": "Bearer " + token}
+    ).json()
     assert "count" in payload and "runs" in payload
 
 

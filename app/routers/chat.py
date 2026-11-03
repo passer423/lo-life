@@ -162,7 +162,14 @@ def chat_stream(payload: ChatIn, user: dict | None = Depends(auth.optional_user)
 
 
 @router.get("/runs")
-def chat_runs(limit: int = Query(10, ge=1, le=100)) -> dict:
-    """最近几次 run 的轨迹。排查"它为什么没找到"靠这个，而不是靠猜。"""
+def chat_runs(
+    limit: int = Query(10, ge=1, le=100),
+    _user: dict = Depends(auth.require_user),
+) -> dict:
+    """最近几次 run 的轨迹。排查"它为什么没找到"靠这个，而不是靠猜。
+
+    **必须登录**：轨迹里是完整的原始问题与回答，属于隐私数据。这个接口原本是
+    匿名可读的，一旦按 README 用 Tailscale 开给手机，等于把问答记录公开给同网设备。
+    """
     records = trace.tail(limit, settings)
     return {"count": len(records), "runs": records}

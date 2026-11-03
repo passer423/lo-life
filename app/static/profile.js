@@ -4,6 +4,23 @@
 
 (function () {
   const TOKEN_KEY = 'lo-life-token';
+  /* app.js 的 getMeasurements() 是同步读 localStorage 的（列表渲染路径）。
+     服务端才是权威来源，这里在读取/保存/清除后把四个围度镜像过去，
+     这样「我的」页填完，尺码页和列表徽标立刻就能用同一份数字。 */
+  const MEASURE_KEY = 'lo-life-measure';
+  const MEASURE_KEYS = ['bust', 'waist', 'hip', 'shoulder'];
+
+  function mirrorMeasurements(body) {
+    try {
+      const usable = {};
+      MEASURE_KEYS.forEach((key) => {
+        if (body && body[key] != null) usable[key] = body[key];
+      });
+      if (Object.keys(usable).length) localStorage.setItem(MEASURE_KEY, JSON.stringify(usable));
+      else localStorage.removeItem(MEASURE_KEY);
+    } catch (_) { /* 隐私模式写不了：不影响服务端保存 */ }
+  }
+
   const FIELDS = [
     ['height', '身高', 'cm', '160'],
     ['weight', '体重', 'kg', '50'],
@@ -96,6 +113,7 @@
     }
 
     host.innerHTML = formHtml(data, data.body || {});
+    if (data.filled) mirrorMeasurements(data.body || {});
 
     document.getElementById('body-save').addEventListener('click', async (event) => {
       const button = event.currentTarget;
@@ -106,6 +124,7 @@
         });
         const payload = await response.json();
         if (!response.ok) throw new Error(payload.detail || ('HTTP ' + response.status));
+        mirrorMeasurements(payload.body || {});
         host.dataset.mounted = '0';
         await mount(host);
         toast('身材参数已保存');
@@ -119,6 +138,7 @@
       if (!window.confirm('清除已保存的身材参数？')) return;
       const response = await fetch('/api/profile/body', { method: 'DELETE', headers: headers() });
       if (!response.ok) { toast('清除失败'); return; }
+      mirrorMeasurements({});
       host.dataset.mounted = '0';
       await mount(host);
       toast('已清除');

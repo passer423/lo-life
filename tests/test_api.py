@@ -480,8 +480,13 @@ def test_media_accepts_png_and_serves_it(client):
     assert client.get(response.json()["url"]).status_code == 200
 
 
+def test_export_requires_login(client):
+    """备份包里是整库（含所有账号的密码哈希与身材数据），匿名不能下载。"""
+    assert client.get("/api/export").status_code == 401
+
+
 def test_export_contains_database_content_and_manifest(client):
-    response = client.get("/api/export")
+    response = client.get("/api/export", headers=bearer(register(client)))
     assert response.status_code == 200
     assert response.headers["content-type"] == "application/zip"
 

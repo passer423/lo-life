@@ -17,12 +17,12 @@ from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
 
-from fastapi import APIRouter, File, HTTPException, Request, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from starlette.background import BackgroundTask
 
-from app import __version__, bridge, db
+from app import __version__, auth, bridge, db
 from app.config import settings
 from app.domain import images, newarrivals
 from app.domain import shops as shop_table
@@ -182,8 +182,12 @@ def _is_loopback(request: Request) -> bool:
 
 
 @router.get("/export")
-def export_backup() -> FileResponse:
+def export_backup(_user: dict = Depends(auth.require_user)) -> FileResponse:
     """把「不可再生的东西」打成一个 zip：数据库 + 照片 + 知识库源文件。
+
+    **必须登录。** 这个 zip 里是**整库**（含所有账号的密码哈希、身材数据）与全部照片，
+    而 README 推荐用 Tailscale 让手机访问——没有这道门，同 tailnet 的任何设备都能
+    直接下载全部数据。这是实例级备份，不是"当前账号的导出"。
 
     数据库用 ``sqlite3.Connection.backup()`` 复制，而不是直接拷 ``app.db``：
     库开着 WAL，直接拷单个文件可能拿到一个缺最新事务的半成品，
