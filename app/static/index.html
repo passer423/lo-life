@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f6f0ec">
+<meta name="description" content="Lolita 上新推荐、关注、知识问答">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="lo 上新">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="icon" href="/icons/icon-192.png">
+<title>lo 上新</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header id="topbar">
+    <h1 id="title">推荐</h1>
+    <span id="netdot" class="dot" title="服务状态"></span>
+  </header>
+
+  <main id="view"><div class="loading">载入中…</div></main>
+
+  <nav id="tabbar">
+    <button data-tab="feed" class="on"><span>✨</span>推荐</button>
+    <button data-tab="preferences"><span>🏷️</span>偏好</button>
+    <button data-tab="kb"><span>🤖</span>助手</button>
+    <button data-tab="me"><span>⚙️</span>我的</button>
+  </nav>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="/chat.js"></script>
+  <script src="/profile.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

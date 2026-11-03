@@ -1,0 +1,7 @@
+# 应用层只新增 Web/上传相关；检索与生成全部复用上游 lolita-rag 的依赖
+# （上游要求见 lolita-rag/requirements.txt，本机已装好）
+fastapi>=0.110
+uvicorn>=0.27
+python-multipart>=0.0.9
+pydantic>=2.0
+pydantic-settings>=2.0

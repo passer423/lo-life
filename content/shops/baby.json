@@ -1,0 +1,11 @@
+{
+  "brand": "baby",
+  "brand_name": "Baby",
+  "shop_url": "https://store.babyssb.co.jp/",
+  "page_url": "https://store.babyssb.co.jp/products.json?limit=250",
+  "catalog": "shopify",
+  "item_href_pattern": "/products/",
+  "note": "日本官网线上商店（Shopify）。优先用官方公开的商品 JSON：标题、主图、商品地址都是结构化的，不用猜 DOM；JSON 拿不到时自动退回 HTML 解析。",
+  "source": "2026-10-31 从 store.babyssb.co.jp 抄下 /products.json",
+  "currency": "JPY"
+}

@@ -1,0 +1,11 @@
+{
+  "brand": "ap",
+  "display_name": "AP",
+  "kind": "item_level",
+  "chart_version": "2026-11",
+  "source": "Angelic Pretty 官方尺码指南 https://angelicpretty.com/Page/guide.aspx（2026-11-02 取）：全品以 JIS 9 号为基准，商品详情页给实测尺寸，不提供 S/M/L 分码",
+  "fit": "正码",
+  "note": "官方不提供品牌级 S/M/L 表。尺寸写在具体商品的 size 字段（newarrivals/<id>.json），判断请用 check_fit 指定条目。",
+  "categories": {},
+  "verified": true
+}

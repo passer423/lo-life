@@ -1,0 +1,46 @@
+{
+  "id": "2026-10-baby-xingxie",
+  "brand": "baby",
+  "brand_name": "Baby",
+  "series": "Dark Night Sweets柄 ワンピース",
+  "release_date": "2026-10-18",
+  "price_range": "57800",
+  "items": [
+    "OP"
+  ],
+  "styles": [
+    "古典",
+    "哥特"
+  ],
+  "image": "/media/d84916ef1e8249ff9b84d71bd170fb13.webp",
+  "link": "https://store.babyssb.co.jp/products/p22op336",
+  "note": "Baby 日本官网预约中。图片、价格、链接取自官网商品页（日元）。",
+  "source": "依据：Baby 官网商品页 https://store.babyssb.co.jp/products/p22op336（2026-10-31 取）",
+  "sample": false,
+  "aliases": [
+    "星屑茶会"
+  ],
+  "currency": "JPY",
+  "size": {
+    "kind": "free",
+    "label": "F",
+    "length": [
+      100.0,
+      100.0
+    ],
+    "bust": [
+      90.0,
+      90.0
+    ],
+    "waist": [
+      73.0,
+      73.0
+    ],
+    "shoulder": [
+      34.0,
+      34.0
+    ],
+    "source": "Baby 官网商品 https://store.babyssb.co.jp/products/p22op336（2026-11-02 取）",
+    "note": "单一尺码；区间来自抽褶结构。"
+  }
+}

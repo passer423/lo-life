@@ -1,0 +1,11 @@
+{
+  "brand": "baby",
+  "display_name": "Baby",
+  "kind": "item_level",
+  "chart_version": "2026-11",
+  "source": "BABY 官方尺码指南 https://shop.baby-aatp.com/pages/sizing-guide（2026-11-02 取）：服装为单一尺码（日本 9 号 / US 6 / S~M），商品页给实测尺寸",
+  "fit": "正码",
+  "note": "官方服装为单一尺码，不提供 S/M/L 表。尺寸写在具体商品的 size 字段（newarrivals/<id>.json），判断请用 check_fit 指定条目。",
+  "categories": {},
+  "verified": true
+}

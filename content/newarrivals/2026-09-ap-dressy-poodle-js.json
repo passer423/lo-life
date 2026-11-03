@@ -1,0 +1,36 @@
+{
+  "id": "2026-09-ap-dressy-poodle-js",
+  "brand": "ap",
+  "brand_name": "AP",
+  "series": "Dressy Ribbon Poodleラウンド切替ジャンパースカート",
+  "release_date": "2026-09-12",
+  "price_range": "63800",
+  "currency": "JPY",
+  "items": [
+    "JSK"
+  ],
+  "styles": [],
+  "image": "/media/aa52be2ff7b24370b6db7423aba2c488.jpg",
+  "link": "https://angelicpretty.com/Form/Product/ProductDetail.aspx?shop=0&pid=262PJ09-020732&cat=OP",
+  "note": "AP 日本官网在售。图片、链接、价格取自官网；日期取自商品页「販売期間」开始日。风格标签待标注。",
+  "source": "依据：AP 官网商品页 https://angelicpretty.com/Form/Product/ProductDetail.aspx?shop=0&pid=262PJ09-020732&cat=OP（2026-11-02 取）",
+  "sample": false,
+  "size": {
+    "kind": "free",
+    "label": "F",
+    "length": [
+      96.0,
+      96.0
+    ],
+    "bust": [
+      89.0,
+      110.0
+    ],
+    "waist": [
+      71.0,
+      98.0
+    ],
+    "source": "AP 官网商品页 https://angelicpretty.com/Form/Product/ProductDetail.aspx?shop=0&pid=262PJ09-020732&cat=OP（2026-11-02 取）",
+    "note": "单一尺码；区间来自抽褶/可调结构。原文里「ウエスト切替位置」按腰围记录。"
+  }
+}

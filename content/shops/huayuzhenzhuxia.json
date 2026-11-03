@@ -1,0 +1,11 @@
+{
+  "brand": "huayuzhenzhuxia",
+  "brand_name": "花与珍珠匣",
+  "shop_url": "",
+  "page_url": "",
+  "catalog": "html",
+  "item_href_pattern": "",
+  "note": "官方微博为主。微博的 robots.txt 是 User-Agent: * + Disallow: /，整站不允许自动抓取，所以这里**故意不填 page_url**。取图走零请求路径：浏览器打开官方账号 → 另存为 HTML → python scripts/fetch_images.py --id 2026-10-huayuzhenzhuxia-duandai --from-html 页面.html --write",
+  "source": "2026-10-31 记录：微博不允许自动抓取，改用 --from-html",
+  "currency": "CNY"
+}

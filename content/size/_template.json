@@ -1,0 +1,39 @@
+{
+  "brand": "template",
+  "display_name": "（品牌名）",
+  "kind": "size_chart",
+  "chart_version": "YYYY-MM",
+  "source": "（官方尺码表链接 / 买家实测 / 自己量）",
+  "fit": "正码",
+  "note": "",
+  "categories": {
+    "JSK": {
+      "key": [
+        "bust",
+        "waist"
+      ],
+      "ease": {
+        "bust": 4,
+        "waist": 2
+      },
+      "sizes": {
+        "S": {
+          "bust": 0,
+          "waist": 0,
+          "length": 0
+        },
+        "M": {
+          "bust": 0,
+          "waist": 0,
+          "length": 0
+        },
+        "L": {
+          "bust": 0,
+          "waist": 0,
+          "length": 0
+        }
+      }
+    }
+  },
+  "verified": false
+}

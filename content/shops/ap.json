@@ -1,0 +1,11 @@
+{
+  "brand": "ap",
+  "brand_name": "AP",
+  "shop_url": "https://angelicpretty.com/",
+  "page_url": "https://angelicpretty.com/Form/Product/ProductList.aspx?shop=0&img=2&cat=ITENEW",
+  "catalog": "html",
+  "item_href_pattern": "ProductDetail.aspx",
+  "note": "日本官网。page_url 是「新作」商品列表（cat=ITENEW）。列表页里图片和标题是两个指向同一商品的 <a>，解析时按地址归并。官方站没有公开的商品 JSON，只能解 HTML。",
+  "source": "2026-10-31 从 angelicpretty.com 导航进入 ProductList.aspx 抄下地址",
+  "currency": "JPY"
+}

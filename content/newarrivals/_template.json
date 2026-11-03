@@ -1,0 +1,15 @@
+{
+  "id": "（唯一 id，建议 年份-月-品牌-系列）",
+  "brand": "brand-id",
+  "brand_name": "品牌显示名",
+  "series": "系列名",
+  "release_date": "YYYY-MM-DD",
+  "price_range": "295 - 880",
+  "items": ["JSK", "SK", "KC"],
+  "styles": ["甜系", "古典"],
+  "image": "",
+  "link": "",
+  "note": "发售方式、配色、注意事项",
+  "source": "依据：官方公告 / 店铺页面 / 自己记录",
+  "sample": false
+}

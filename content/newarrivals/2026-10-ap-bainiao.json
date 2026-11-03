@@ -1,0 +1,42 @@
+{
+  "id": "2026-10-ap-bainiao",
+  "brand": "ap",
+  "brand_name": "AP",
+  "series": "Lovely Princessジャンパースカート",
+  "release_date": "2026-10-30",
+  "price_range": "55000",
+  "items": [
+    "JSK"
+  ],
+  "styles": [
+    "古典",
+    "甜系"
+  ],
+  "image": "/media/3c92e678fca84117a0d7ded0b0515e70.jpg",
+  "link": "https://angelicpretty.com/Form/Product/ProductDetail.aspx?shop=0&pid=262J10-020738&cat=ITENEW",
+  "note": "AP 日本官网在售。图片、链接、价格取自官网商品页（日元）。",
+  "source": "依据：AP 官网商品页 https://angelicpretty.com/Form/Product/ProductDetail.aspx?shop=0&pid=262J10-020738&cat=ITENEW（2026-10-31 取）",
+  "sample": false,
+  "aliases": [
+    "白鸟笼"
+  ],
+  "currency": "JPY",
+  "size": {
+    "kind": "free",
+    "label": "F",
+    "length": [
+      89.0,
+      89.0
+    ],
+    "bust": [
+      91.0,
+      101.0
+    ],
+    "waist": [
+      74.0,
+      86.0
+    ],
+    "source": "AP 官网商品 https://angelicpretty.com/Form/Product/ProductDetail.aspx?shop=0&pid=262J10-020738&cat=ITENEW（2026-11-03 取）",
+    "note": "AP 官方以 JIS 9 号为基准；区间来自商品页实测，抽褶/可调结构可能带来弹性。"
+  }
+}

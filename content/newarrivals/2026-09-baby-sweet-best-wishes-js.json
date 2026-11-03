@@ -1,0 +1,36 @@
+{
+  "id": "2026-09-baby-sweet-best-wishes-js",
+  "brand": "baby",
+  "brand_name": "Baby",
+  "series": "Sweet Best Wishes ジャンパースカート（サッカーギンガム地）",
+  "release_date": "2026-09-07",
+  "price_range": "44800",
+  "currency": "JPY",
+  "items": [
+    "JSK"
+  ],
+  "styles": [],
+  "image": "/media/2fd3afcc0eb645128ed447907870f5e7.webp",
+  "link": "https://store.babyssb.co.jp/products/b50js258",
+  "note": "Baby 日本官网在售。图片、价格、链接取自官方商品 JSON；日期取自商品的 created_at。风格标签待标注。",
+  "source": "依据：Baby 官网商品 https://store.babyssb.co.jp/products/b50js258（2026-11-02 取）",
+  "sample": false,
+  "size": {
+    "kind": "free",
+    "label": "F",
+    "length": [
+      90.0,
+      94.0
+    ],
+    "bust": [
+      88.0,
+      94.0
+    ],
+    "waist": [
+      70.0,
+      76.0
+    ],
+    "source": "Baby 官网商品 https://store.babyssb.co.jp/products/b50js258（2026-11-02 取）",
+    "note": "单一尺码；区间来自抽褶结构。"
+  }
+}

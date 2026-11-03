@@ -1,0 +1,220 @@
+{
+  "version": "2026-11",
+  "说明": "洗护规则。每条规则只管一件事，用 tags 里的标签组匹配（每组至少命中一个值才生效），所以「蕾丝 + 烫金」会同时命中两条。ref 指向 content/kb/ 里的知识库条目 id，便于回溯。",
+  "options": {
+    "materials": ["蕾丝", "网纱", "欧根纱", "雪纺", "真丝", "缎面", "棉", "涤纶", "羊毛", "醋酸", "人造丝", "丝绒", "天鹅绒"],
+    "crafts": ["烫金", "烫钻", "亮片", "印花", "刺绣"],
+    "notes": ["只能干洗", "有钢圈裙撑", "深色易掉色", "红色/酒红易掉色", "白色/米白易泛黄", "彩色/拼色易串色", "首次洗"]
+  },
+  "rules": [
+    {
+      "id": "jinshu",
+      "title": "烫金 / 烫钻会整片脱落",
+      "severity": "forbid",
+      "blocks_machine_wash": true,
+      "tags": { "crafts": ["烫金", "烫钻"] },
+      "advice": [
+        "不要机洗：脱水时的离心力会把胶层整片撕下来。",
+        "不要烘干、不要熨烫装饰面，热水会让胶层软化。",
+        "翻到反面，冷水加中性洗涤剂轻轻按压，装饰部位只过水不揉。",
+        "洗完用干毛巾卷起来吸水，平铺阴干，不要拧、不要挂。"
+      ],
+      "ref": "care-jinshu"
+    },
+    {
+      "id": "liangpian",
+      "title": "亮片会被钩掉",
+      "severity": "forbid",
+      "blocks_machine_wash": true,
+      "tags": { "crafts": ["亮片"] },
+      "advice": [
+        "不要机洗：滚筒和内壁会钩住亮片。",
+        "洗之前先检查有没有翘边的亮片，用线固定一下再洗，否则会越洗掉越多。",
+        "粘上去的亮片和烫钻一样怕热水。"
+      ],
+      "ref": "care-jinshu"
+    },
+    {
+      "id": "yinhua",
+      "title": "柄图怕高温与漂白",
+      "severity": "warn",
+      "blocks_machine_wash": false,
+      "tags": { "crafts": ["印花"] },
+      "advice": [
+        "冷水、中性洗涤剂，不要漂白。",
+        "不要烘干、不要熨烫图案面；热转印的图案沿折痕最容易开裂。"
+      ],
+      "ref": "term-bingtu"
+    },
+    {
+      "id": "cixiu",
+      "title": "刺绣要防勾",
+      "severity": "warn",
+      "blocks_machine_wash": false,
+      "tags": { "crafts": ["刺绣"] },
+      "advice": [
+        "翻面并装进洗衣袋，避免绣线与拉链、扣子互相摩擦起毛。"
+      ],
+      "ref": ""
+    },
+    {
+      "id": "leisi",
+      "title": "蕾丝、网纱、欧根纱怕勾丝与变形",
+      "severity": "warn",
+      "blocks_machine_wash": false,
+      "tags": { "materials": ["蕾丝", "网纱", "欧根纱"] },
+      "advice": [
+        "拆掉可拆的缎带、胸针，翻面装洗衣袋再洗。",
+        "不要用洗衣机甩干，用干毛巾卷起来压水。",
+        "晾的时候平铺，挂起来会拉长变形。",
+        "欧根纱怕压折，洗后带水平铺阴干，不要折叠存放。"
+      ],
+      "ref": "care-lace"
+    },
+    {
+      "id": "zhensi",
+      "title": "真丝必须手洗",
+      "severity": "forbid",
+      "blocks_machine_wash": true,
+      "tags": { "materials": ["真丝"] },
+      "advice": [
+        "不要机洗：机械力会让真丝失去光泽并起灰伤。",
+        "只能用中性或丝毛专用洗涤剂，绝对不能用含酶的洗衣液和碱性皂。",
+        "水温 30 度以内，浸泡不超过 5 分钟；不能拧、不能暴晒、不能氯漂。",
+        "半干时中低温反面熨烫可以恢复光泽。"
+      ],
+      "ref": "care-lace"
+    },
+    {
+      "id": "xuefang",
+      "title": "雪纺怕皱与静电",
+      "severity": "warn",
+      "blocks_machine_wash": false,
+      "tags": { "materials": ["雪纺"] },
+      "advice": [
+        "冷水手洗，不要用力拧，拧过的地方会留下永久折痕。",
+        "洗后半干时轻轻拉平边缘，平铺阴干，不要暴晒（紫外线下会泛黄）。"
+      ],
+      "ref": "care-lace"
+    },
+    {
+      "id": "maoni",
+      "title": "羊毛会缩水起球",
+      "severity": "warn",
+      "blocks_machine_wash": false,
+      "tags": { "materials": ["羊毛"] },
+      "advice": [
+        "用羊毛专用洗涤剂，冷水短时间浸泡，不要搓揉。",
+        "不要烘干、不要挂晾，平铺阴干并整形。"
+      ],
+      "ref": ""
+    },
+    {
+      "id": "duanmian",
+      "title": "缎面容易留水渍",
+      "severity": "warn",
+      "blocks_machine_wash": false,
+      "tags": { "materials": ["缎面"] },
+      "advice": [
+        "手洗后不要拧干，直接带水平铺阴干，水质硬时容易留水痕。",
+        "熨烫要垫布、低温、反面。"
+      ],
+      "ref": ""
+    },
+    {
+      "id": "cuzhi",
+      "title": "醋酸、人造丝湿水后强度低",
+      "severity": "forbid",
+      "blocks_machine_wash": true,
+      "tags": { "materials": ["醋酸", "人造丝"] },
+      "advice": [
+        "不要机洗：湿水后强度低，滚筒搅动容易拉变形。",
+        "手洗，冷水加中性洗涤剂，轻轻按压，不要搓。",
+        "不要拧干，用毛巾轻压吸水后平铺阴干。"
+      ],
+      "ref": "care-lace"
+    },
+    {
+      "id": "sirong",
+      "title": "丝绒、天鹅绒建议干洗",
+      "severity": "forbid",
+      "blocks_machine_wash": true,
+      "tags": { "materials": ["丝绒", "天鹅绒"] },
+      "advice": [
+        "建议干洗：不要机洗、不要拧、不要熨。",
+        "水洗会压痕、倒毛；必须水洗时只可冷水轻压，平铺阴干。"
+      ],
+      "ref": "care-lace"
+    },
+    {
+      "id": "mian-di",
+      "title": "棉与涤纶本身耐洗",
+      "severity": "tip",
+      "blocks_machine_wash": false,
+      "tags": { "materials": ["棉", "涤纶"] },
+      "advice": [
+        "棉与涤纶本身可按常规洗涤；其余材质与工艺的限制优先。"
+      ],
+      "ref": ""
+    },
+    {
+      "id": "dry-clean-only",
+      "title": "洗标标注只能干洗",
+      "severity": "forbid",
+      "blocks_machine_wash": true,
+      "tags": { "notes": ["只能干洗"] },
+      "advice": [
+        "洗标要求干洗时不要自己水洗。",
+        "若坚持自己洗，先在不显眼的内缝处试一小块，干了看有没有掉色、发硬、起皱。"
+      ],
+      "ref": "care-lace"
+    },
+    {
+      "id": "steel-hoop",
+      "title": "钢圈裙撑不适合机洗",
+      "severity": "warn",
+      "blocks_machine_wash": false,
+      "tags": { "notes": ["有钢圈裙撑"] },
+      "advice": [
+        "裙撑手洗，洗完撑开阴干，不要折叠存放（折痕会留在纱上）。"
+      ],
+      "ref": "guide-chengqun"
+    },
+    {
+      "id": "dark-fade",
+      "title": "深色、红色和首次洗注意掉色",
+      "severity": "warn",
+      "blocks_machine_wash": false,
+      "tags": { "notes": ["深色易掉色", "红色/酒红易掉色", "首次洗"] },
+      "advice": [
+        "单独洗，不要和浅色混在一起。",
+        "首次洗用冷水快洗，不要浸泡，避免染色不均。"
+      ],
+      "ref": "care-lace"
+    },
+    {
+      "id": "white-yellow",
+      "title": "白色、米白怕泛黄",
+      "severity": "warn",
+      "blocks_machine_wash": false,
+      "tags": { "notes": ["白色/米白易泛黄"] },
+      "advice": [
+        "不要长时间浸泡，也不要暴晒；紫外线和久泡都会让白色泛黄。",
+        "不要用含氯漂白剂；洗标允许时可用氧系漂白，先在不显眼处试。"
+      ],
+      "ref": "care-lace"
+    },
+    {
+      "id": "color-bleed",
+      "title": "彩色、拼色怕串色",
+      "severity": "warn",
+      "blocks_machine_wash": false,
+      "tags": { "notes": ["彩色/拼色易串色"] },
+      "advice": [
+        "第一次洗单独冷水快洗，不要浸泡，避免染到浅色。",
+        "拼色、印花反面洗，别熨图案面；彩色蕾丝先在内缝用湿白布试色。"
+      ],
+      "ref": "care-lace"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "2026-10-ap-buttercream-op",
+  "brand": "ap",
+  "brand_name": "AP",
+  "series": "Buttercream Cakeワンピース",
+  "release_date": "2026-10-03",
+  "price_range": "52800",
+  "currency": "JPY",
+  "items": [
+    "OP"
+  ],
+  "styles": [],
+  "image": "/media/7a977ce703a64777b5dd5fe4fe48103c.jpg",
+  "link": "https://angelicpretty.com/Form/Product/ProductDetail.aspx?shop=0&pid=262PO10-030665&cat=OP",
+  "note": "AP 日本官网在售。图片、链接、价格取自官网；日期取自商品页「販売期間」开始日。风格标签待标注。",
+  "source": "依据：AP 官网商品页 https://angelicpretty.com/Form/Product/ProductDetail.aspx?shop=0&pid=262PO10-030665&cat=OP（2026-11-02 取）",
+  "sample": false,
+  "size": {
+    "kind": "free",
+    "label": "F",
+    "length": [
+      93.0,
+      93.0
+    ],
+    "bust": [
+      91.0,
+      91.0
+    ],
+    "waist": [
+      70.0,
+      70.0
+    ],
+    "shoulder": [
+      34.0,
+      34.0
+    ],
+    "source": "AP 官网商品 https://angelicpretty.com/Form/Product/ProductDetail.aspx?shop=0&pid=262PO10-030665&cat=OP（2026-11-03 取）",
+    "note": "AP 官方以 JIS 9 号为基准；区间来自商品页实测，抽褶/可调结构可能带来弹性。"
+  }
+}

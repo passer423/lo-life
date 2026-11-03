@@ -1,0 +1,42 @@
+{
+  "id": "2026-10-baby-qiuri",
+  "brand": "baby",
+  "brand_name": "Baby",
+  "series": "Dark Night Sweets柄 ジャンパースカートII",
+  "release_date": "2026-10-29",
+  "price_range": "41800",
+  "items": [
+    "JSK"
+  ],
+  "styles": [
+    "甜系",
+    "古典"
+  ],
+  "image": "/media/dafecfedafb14ed490c570ab34e9eac8.webp",
+  "link": "https://store.babyssb.co.jp/products/p22oj208",
+  "note": "Baby 日本官网预约中。图片、价格、链接取自官网商品页（日元）。",
+  "source": "依据：Baby 官网商品页 https://store.babyssb.co.jp/products/p22oj208（2026-10-31 取）",
+  "sample": false,
+  "aliases": [
+    "秋日私语"
+  ],
+  "currency": "JPY",
+  "size": {
+    "kind": "free",
+    "label": "F",
+    "length": [
+      98.0,
+      98.0
+    ],
+    "bust": [
+      86.0,
+      104.0
+    ],
+    "waist": [
+      74.0,
+      92.0
+    ],
+    "source": "Baby 官网商品 https://store.babyssb.co.jp/products/p22oj208（2026-11-02 取）",
+    "note": "单一尺码；区间来自抽褶结构。"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "id": "2026-08-ap-pastel-toys-js",
+  "brand": "ap",
+  "brand_name": "AP",
+  "series": "Pastel Toys Theaterハートジャンパースカート",
+  "release_date": "2026-08-22",
+  "price_range": "47300",
+  "currency": "JPY",
+  "items": [
+    "JSK"
+  ],
+  "styles": [],
+  "image": "/media/e1acc934f24345c5bf5612b3c0e1f5bf.jpg",
+  "link": "https://angelicpretty.com/Form/Product/ProductDetail.aspx?shop=0&pid=262PJ08-020727&cat=OP",
+  "note": "AP 日本官网在售。图片、链接、价格取自官网；日期取自商品页「販売期間」开始日。风格标签待标注。",
+  "source": "依据：AP 官网商品页 https://angelicpretty.com/Form/Product/ProductDetail.aspx?shop=0&pid=262PJ08-020727&cat=OP（2026-11-02 取）",
+  "sample": false,
+  "size": {
+    "kind": "free",
+    "label": "F",
+    "length": [
+      89.0,
+      89.0
+    ],
+    "bust": [
+      90.0,
+      114.0
+    ],
+    "waist": [
+      70.0,
+      102.0
+    ],
+    "source": "AP 官网商品 https://angelicpretty.com/Form/Product/ProductDetail.aspx?shop=0&pid=262PJ08-020727&cat=OP（2026-11-03 取）",
+    "note": "AP 官方以 JIS 9 号为基准；区间来自商品页实测，抽褶/可调结构可能带来弹性。"
+  }
+}

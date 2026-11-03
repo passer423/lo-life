@@ -1,0 +1,36 @@
+{
+  "id": "2026-10-baby-fallin-ribbon-js",
+  "brand": "baby",
+  "brand_name": "Baby",
+  "series": "Fallin’ Ribbonジャンパースカート",
+  "release_date": "2026-10-18",
+  "price_range": "43800",
+  "currency": "JPY",
+  "items": [
+    "JSK"
+  ],
+  "styles": [],
+  "image": "/media/afb66ce2ab4c4a129fe65081345b4743.webp",
+  "link": "https://store.babyssb.co.jp/products/b50js252",
+  "note": "Baby 日本官网在售。图片、价格、链接取自官方商品 JSON；日期取自商品的 created_at。风格标签待标注。",
+  "source": "依据：Baby 官网商品 https://store.babyssb.co.jp/products/b50js252（2026-11-02 取）",
+  "sample": false,
+  "size": {
+    "kind": "free",
+    "label": "F",
+    "length": [
+      99.0,
+      104.0
+    ],
+    "bust": [
+      90.0,
+      99.0
+    ],
+    "waist": [
+      74.0,
+      85.0
+    ],
+    "source": "Baby 官网商品 https://store.babyssb.co.jp/products/b50js252（2026-11-02 取）",
+    "note": "单一尺码；区间来自抽褶结构。"
+  }
+}
