@@ -16,8 +16,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 APP_ROOT = Path(__file__).resolve().parents[1]
 
-# 上游仓库的位置。允许用 .env 覆盖，这样整个项目搬到别的机器/盘符也不用改代码。
-DEFAULT_RAG_ROOT = Path(r"D:\Users\50436\Documents\Trae-CN\temp_20261012_01\lolita-rag")
+# 上游仓库的位置。默认取本仓同级的 lolita-rag（README 的推荐布局）；
+# 放在别的盘/目录时用 .env 的 LOLITA_RAG_ROOT 覆盖，不用改代码。
+DEFAULT_RAG_ROOT = APP_ROOT.parent / "lolita-rag"
 
 
 class AppSettings(BaseSettings):
