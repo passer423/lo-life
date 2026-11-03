@@ -34,7 +34,6 @@ ROOT = Path(__file__).resolve().parents[1]
 BOUNDARY = "----lolifesmoke"
 PROBE_BRAND = "baby"
 PROBE_STYLE = "甜系"
-PROBE_KEYWORD = "齿轮"      # 只出现在「缎带与齿轮」的系列名里
 PROBE_MISS = "量子计算"     # 内容里肯定没有，用来验命中回报
 
 failures: list[str] = []
@@ -79,6 +78,12 @@ def _json(payload: bytes) -> dict:
         return json.loads(payload.decode("utf-8"))
     except json.JSONDecodeError:
         return {}
+
+
+def items_source(feed: dict) -> dict:
+    """从 feed 里挑一条做探针：优先第一条（有 id 就能验商品级尺码/关键词）。"""
+    items = feed.get("items") or []
+    return items[0] if items else {}
 
 
 def get_json(path: str, token: str = "") -> tuple[int, dict, dict]:
@@ -205,7 +210,11 @@ def main() -> int:
         check("匿名时没有个性化加分",
               all(not item.get("reasons") for item in feed.get("items") or []),
               "匿名请求带上了偏好加权")
-        check("示例数据被标出", feed.get("has_sample_data") is True, "")
+        # 示例数据来自内容本身：有 sample 条目时必须标出，没有时不能谎报。
+        # 写死 "必须为 True" 会在真实条目替换掉占位数据后变成一条永远红的旧断言。
+        sample_count = int((feed.get("summary") or {}).get("sample_count") or 0)
+        check("示例数据标记与内容一致",
+              feed.get("has_sample_data") is bool(sample_count), f"sample_count={sample_count}")
 
         if token:
             status_anon_pref, _ = put_json("/api/preferences", {"styles": [PROBE_STYLE]})
@@ -243,14 +252,17 @@ def main() -> int:
                   after_partial["preferences"].get("styles") == [PROBE_STYLE],
                   str(after_partial["preferences"]))
 
-            # 自定义标签（唯一的自由输入轴）
+            # 自定义标签（唯一的自由输入轴）。
+            # 关键词从当前内容里取，不写死某个系列名——系列改名/归档后旧断言必然误报。
+            probe_keyword = str((items_source(feed) or {}).get("series") or "")
+            probe_keyword = probe_keyword.replace(" ", "")[:6] or PROBE_BRAND
             status_kw, kw_saved = put_json(
-                "/api/preferences", {"keywords": [PROBE_KEYWORD, PROBE_MISS]}, token=token
+                "/api/preferences", {"keywords": [probe_keyword, PROBE_MISS]}, token=token
             )
             check("保存自定义标签 200", status_kw == 200, f"got {status_kw}")
             report = (kw_saved.get("match_report") or {}).get("keywords") or {}
             check("命中的自定义标签被识别",
-                  PROBE_KEYWORD in (report.get("matched") or []), str(report))
+                  probe_keyword in (report.get("matched") or []), str(report))
             check("未命中的自定义标签被标出",
                   PROBE_MISS in (report.get("unmatched") or []), str(report))
 
@@ -280,12 +292,20 @@ def main() -> int:
         print("\n[5] 确定性工具（尺码 / 洗护）")
         _, size_brands, _ = get_json("/api/size/brands")
         check("拿到品牌尺码表", len(size_brands.get("brands") or []) > 0, "")
-        status_size, size_body = post_json("/api/size/recommend", {
+        # AP/Baby 是 item_level：官方不给品牌级 S/M/L，硬算一个码就是编。
+        # 所以这里断言"不返回伪造码数"，再用具体商品验证区间型合身判断。
+        status_brand, _ = post_json("/api/size/recommend", {
             "brand": "baby", "category": "JSK", "bust": 86, "waist": 68,
         })
-        check("尺码推荐 200", status_size == 200, f"got {status_size}")
-        check("尺码结论符合版型修正", size_body.get("recommended") == "L",
-              str(size_body.get("recommended")))
+        check("item_level 品牌不编品牌级码数（404）", status_brand == 404, f"got {status_brand}")
+
+        probe_entry = items_source(feed) or {}
+        status_fit, fit_body = post_json("/api/feed/sizes", {
+            "ids": [probe_entry.get("id")], "bust": 86, "waist": 68, "hip": 90, "shoulder": 38,
+        })
+        fit = (fit_body.get("sizes") or {}).get(str(probe_entry.get("id")), {})
+        check("商品级区间尺码可判断合身",
+              status_fit == 200 and fit.get("status") == "ok", f"{status_fit} {fit}")
 
         status_care, care_body = post_json("/api/care/advice", {
             "materials": ["蕾丝"], "crafts": ["烫金"],
@@ -310,13 +330,18 @@ def main() -> int:
             check(f"{path} 可访问", status_asset == 200 and needle in body, f"{status_asset}")
 
         print("\n[8] 备份导出")
-        status_zip, payload, _ = _send("/api/export")
-        check("导出 200", status_zip == 200, f"got {status_zip}")
-        check("导出是 zip", payload[:2] == b"PK", payload[:8].hex())
-        check("备份包含数据库", b"app.db" in payload, "zip 里没有 app.db")
-        check("备份包含清单", b"MANIFEST.json" in payload, "zip 里没有 MANIFEST.json")
-        check("备份包含上新内容", b"content/newarrivals/" in payload, "")
-        check("备份包含知识库", b"content/kb/" in payload, "")
+        status_anon_zip, _, _ = _send("/api/export")
+        check("匿名导出 401", status_anon_zip == 401, f"got {status_anon_zip}")
+        if token:
+            status_zip, payload, _ = _send("/api/export", token=token)
+            check("登录后导出 200", status_zip == 200, f"got {status_zip}")
+            check("导出是 zip", payload[:2] == b"PK", payload[:8].hex())
+            check("备份包含数据库", b"app.db" in payload, "zip 里没有 app.db")
+            check("备份包含清单", b"MANIFEST.json" in payload, "zip 里没有 MANIFEST.json")
+            check("备份包含上新内容", b"content/newarrivals/" in payload, "")
+            check("备份包含知识库", b"content/kb/" in payload, "")
+        else:
+            print("  [skip] 没有临时账号令牌，跳过登录导出检查。")
 
     finally:
         print("\n[9] 清理")

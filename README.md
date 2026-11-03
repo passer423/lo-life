@@ -763,7 +763,7 @@ zip 里是 `app.db`（用 SQLite 的 `backup()` 复制，不是直接拷文件�
 ```bash
 python -m pip install -r requirements-dev.txt
 python -m pytest -q            # 462 项：认证 / 偏好轴 / 上新 / 搜索排序 / 推荐 / 价格 / 取图 / 尺码 / 洗护 / 草稿 / agent / 数据层 / 接口
-python scripts/smoke.py        # 62 项端到端，需要服务在跑
+python scripts/smoke.py        # 63 项端到端，需要服务在跑
 ```
 
 * `pytest` 用 `tests/.data` 作为数据目录（`tests/conftest.py` 在导入前设 `DATA_DIR`），**绝不碰真实 `data/`**。
