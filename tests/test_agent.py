@@ -165,6 +165,8 @@ def test_search_feed_no_match_is_empty_not_error(feed_ctx):
     assert result["ok"] is True
     assert result["empty"] is True
     assert result["evidence"] == []
+    # 商品没查到时不能把洗护问题一起判死，观察里要提示切到 care_advice
+    assert "care_advice" in result["summary"]
 
 
 def test_search_feed_price_filter(feed_ctx):
@@ -613,6 +615,8 @@ def test_item_profile_unknown_entry_is_a_conclusion(feed_ctx):
     assert result["status"] == "no_data"
     assert result["empty"] is False        # 没有这条是结论，不是"没查到"
     assert "没有匹配的上新条目" in result["evidence"][0]["title"]
+    # 商品没收录不等于洗护问题无解：观察里要提示继续查洗护
+    assert "care_advice" in result["summary"]
 
 
 def test_system_prompt_mentions_profile_without_leaking_numbers():
@@ -626,6 +630,15 @@ def test_system_prompt_mentions_profile_without_leaking_numbers():
         assert leaked not in text
     # 没填时也要说清：用 check_fit，它会告诉你缺什么，不要编
     assert "还没填" in build_system_prompt(None)
+
+
+def test_system_prompt_routes_care_intent_after_product_miss():
+    """商品查空后要能切到洗护，不然「四时花怎么洗」会被商品名带偏。"""
+    from app.agent.planner import build_system_prompt
+
+    prompt = build_system_prompt(None)
+    assert "洗护问题不要被商品查询带偏" in prompt
+    assert "商品没收录不等于洗护问题无解" in prompt
 
 
 # --------------------------------------------------------------------- 多轮

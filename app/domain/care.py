@@ -11,6 +11,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
@@ -52,6 +53,36 @@ def _norm(value: str) -> str:
     return str(value or "").strip().lower()
 
 
+# 模型不一定照抄选项标签：问「红色」时它可能传「红色易掉色」，而规则里的标签是
+# 「红色/酒红易掉色」。这里只把**明确的近义说法**归一到标准标签；认不出来的值
+# 原样保留，仍然走「没有匹配到规则就说不知道」那条红线。
+_NOTE_ALIASES: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("红色/酒红易掉色", ("红色", "酒红")),
+    ("白色/米白易泛黄", ("白色", "米白", "泛黄")),
+    ("彩色/拼色易串色", ("彩色", "拼色", "串色")),
+    ("深色易掉色", ("深色", "掉色")),
+    ("首次洗", ("首次",)),
+    ("只能干洗", ("只能干洗", "需要干洗", "必须干洗")),
+    ("有钢圈裙撑", ("钢圈", "裙撑")),
+)
+
+
+def _canonical_notes(values: Iterable[str]) -> set[str]:
+    notes: set[str] = set()
+    for value in values:
+        for part in re.split(r"[、，,；;]+", str(value or "")):
+            text = _norm(part)
+            if not text:
+                continue
+            for canonical, keywords in _NOTE_ALIASES:
+                if canonical in text or any(keyword in text for keyword in keywords):
+                    notes.add(_norm(canonical))
+                    break
+            else:
+                notes.add(text)
+    return notes
+
+
 def load_rules(care_dir: Path) -> tuple[list[Rule], dict[str, list[str]]]:
     """返回 (规则列表, 可选标签)。标签清单给前端渲染成可点的按钮。"""
     path = care_dir / "rules.json"
@@ -89,7 +120,7 @@ def advise(
     supplied: dict[str, set[str]] = {
         "materials": {_norm(item) for item in materials if item},
         "crafts": {_norm(item) for item in crafts if item},
-        "notes": {_norm(item) for item in notes if item},
+        "notes": _canonical_notes(notes),
     }
     if not any(supplied.values()):
         raise ValueError("至少要选一项面料、工艺或属性")

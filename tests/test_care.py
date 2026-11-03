@@ -161,3 +161,18 @@ def test_real_rules_cover_color_notes():
         result = care.advise(loaded, notes=[note])
         assert result["known"] is True
         assert "care-lace" in result["refs"]
+
+
+def test_note_aliases_map_to_standard_rules():
+    """模型传「红色易掉色」这类近义说法时，也要能命中标准标签。"""
+    loaded, _ = care.load_rules(ROOT / "content" / "care")
+    cases = (
+        ("红色易掉色", "dark-fade"),
+        ("深色掉色", "dark-fade"),
+        ("白色泛黄", "white-yellow"),
+        ("拼色串色", "color-bleed"),
+    )
+    for note, rule_id in cases:
+        result = care.advise(loaded, notes=[note])
+        assert result["known"] is True
+        assert any(item["id"] == rule_id for item in result["matched"])

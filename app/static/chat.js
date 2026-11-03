@@ -12,6 +12,21 @@
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
+  // 回答里的 [n] 标成小上标；先转义再替换，避免把用户内容当 HTML
+  const formatText = (text) => esc(text || '')
+    .replace(/\[(\d+)\]/g, '<sup class="cite" data-n="$1">[$1]</sup>')
+    .replace(/\n/g, '<br>');
+
+  // 过程里别直接甩工具名：问的人不需要知道 "care_advice" 是什么
+  const TOOL_LABELS = {
+    search_feed: '翻上新',
+    search_kb: '查知识库',
+    care_advice: '查洗护',
+    size_recommend: '算尺码',
+    check_fit: '比尺寸',
+    item_profile: '查款式档案',
+  };
+
   const token = () => {
     try { return localStorage.getItem(TOKEN_KEY) || ''; } catch (_) { return ''; }
   };
@@ -35,10 +50,7 @@
 
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
-    // 回答里的 [n] 做成小上标，点不到也别扭——这里只做高亮，不做跳转
-    bubble.innerHTML = esc(message.content || '')
-      .replace(/\[(\d+)\]/g, '<sup class="cite">[$1]</sup>')
-      .replace(/\n/g, '<br>');
+    bubble.innerHTML = formatText(message.content);
 
     if (message.steps && message.steps.length) {
       const details = document.createElement('details');
@@ -46,7 +58,7 @@
       const used = message.steps.filter((step) => step.kind === 'tool');
       details.innerHTML = '<summary>过程（' + used.length + ' 步）</summary>' +
         message.steps.map((step) => step.kind === 'tool'
-          ? '<div class="step">· ' + esc(step.tool) + ' → ' +
+          ? '<div class="step">· ' + esc(TOOL_LABELS[step.tool] || step.tool) + ' → ' +
             (step.empty ? '空' : (step.evidence || 0) + ' 条') +
             (step.summary ? '<span class="step-sum">' + esc(step.summary) + '</span>' : '') + '</div>'
           : '<div class="step">· ' + esc(step.kind) + '</div>').join('');
@@ -59,11 +71,22 @@
     if (message.evidence && message.evidence.length) {
       const evidence = document.createElement('div');
       evidence.className = 'evidence';
-      evidence.innerHTML = message.evidence.map((item) =>
-        '<div class="ev"><span class="ev-n">[' + item.n + ']</span>' +
+      evidence.innerHTML = '<div class="ev-head">参考来源</div>' + message.evidence.map((item) =>
+        '<div class="ev" data-n="' + item.n + '"><span class="ev-n">[' + item.n + ']</span>' +
         '<span class="ev-title">' + esc(item.title) + '</span>' +
         '<div class="ev-text">' + esc(item.text) + '</div></div>').join('');
       wrap.appendChild(evidence);
+
+      // 点回答里的 [n] 跳到对应来源，和知识库页面的交互保持一致
+      wrap.querySelectorAll('.cite[data-n]').forEach((node) => {
+        node.addEventListener('click', () => {
+          const target = wrap.querySelector('.ev[data-n="' + node.dataset.n + '"]');
+          if (!target) return;
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          target.classList.add('flash');
+          setTimeout(() => target.classList.remove('flash'), 1200);
+        });
+      });
     }
     return wrap;
   }
@@ -144,19 +167,16 @@
           if (event.type === 'step') {
             steps.push(event);
             if (event.kind === 'tool' && !answer.content) {
-              bubble.innerHTML = '<span class="thinking">' + esc(event.tool) + '…</span>';
+              bubble.innerHTML = '<span class="thinking">' +
+                esc(TOOL_LABELS[event.tool] || '查一下') + '…</span>';
             }
           } else if (event.type === 'delta') {
             answer.content += event.text;
-            bubble.innerHTML = esc(answer.content)
-              .replace(/\[(\d+)\]/g, '<sup class="cite">[$1]</sup>')
-              .replace(/\n/g, '<br>');
+            bubble.innerHTML = formatText(answer.content);
             ui.list.scrollTop = ui.list.scrollHeight;
           } else if (event.type === 'replace') {
             answer.content = event.text;
-            bubble.innerHTML = esc(answer.content)
-              .replace(/\[(\d+)\]/g, '<sup class="cite">[$1]</sup>')
-              .replace(/\n/g, '<br>');
+            bubble.innerHTML = formatText(answer.content);
           } else if (event.type === 'final') {
             answer.content = event.answer;
             answer.steps = event.steps || steps;

@@ -1,14 +1,27 @@
 ﻿# lo-life
 
-Lolita **上新助手**：看有什么新的、关注几个牌子、不懂的查知识库。跑在你自己机器上的本地优先 Web 应用（可安装为 PWA，手机同样能用）。
+Lolita **上新助手**：看有什么新的、挑几个喜欢的店、不懂的查知识库。跑在你自己机器上的本地优先 Web 应用（可安装为 PWA，手机同样能用）。
 
-四个页面：**推荐**（最近上新，按偏好排序）· **偏好**（店家 / 风格 / 款式标签）· **知识**（问答/尺码/洗护）· **我的**（账号）。
+四个页面：**推荐**（最近上新，按偏好排序）· **偏好**（店家 / 风格 / 自定义 / 款式）· **助手**（问答 / 尺码 / 洗护）· **我的**（账号）。
 
-知识检索与答案生成**不在这里实现**——直接复用 [lolita-rag](../lolita-rag) 的清洗、切分、BGE 向量、混合检索、五道闸门与答案校验。这个仓库只做三件事：
+知识检索与答案生成**不在这里实现**——直接复用 [lolita-rag](../lolita-rag) 的清洗、切分、BGE 向量、混合检索、五道闸门与答案校验。本仓库负责的是它周围的一圈：
 
-1. **用户状态**：账号、关注了哪些品牌、喜欢哪些店和风格（SQLite）
-2. **前端**：原生 JS、零依赖、零 CDN 的 PWA
-3. **服务层**：把知识问答转发给上游管线，不重写它
+1. **用户状态**：账号、会话、偏好、身材参数（SQLite）
+2. **内容与数据接入**：自有知识库、上新、尺码、洗护，以及官方商品页 / Lolibrary 档案
+3. **助手层**：6 个只读工具 + 单 planner 循环，把检索与业务事实组织成回答
+4. **前端**：原生 JS、零依赖、零 CDN 的 PWA
+
+## 目录
+
+- [数据源与边界](#数据源与边界)
+- [快速开始](#快速开始)
+- [结构](#结构)
+- [上新怎么录](#上新怎么录)
+- [账号与偏好](#账号与偏好)
+- [数据与备份](#数据与备份)
+- [测试](#测试)
+- [已知粗糙处](#已知粗糙处)
+- [与上游的关系](#与上游的关系)
 
 ---
 
@@ -16,14 +29,27 @@ Lolita **上新助手**：看有什么新的、关注几个牌子、不懂的查
 
 |  | 上游 lolita-rag | 本仓库 |
 |---|---|---|
-| 职责 | 知识管线（与数据源无关） | 应用层（内容 + 用户状态 + 界面） |
-| 语料 | 采集的微博 UGC（**仅本地私有**） | **自有整理**的知识库（可对外） |
-| 索引 | `data/index/` | `data/kbindex/` |
+| 职责 | 知识管线（与数据源无关） | 应用层（内容接入 + 用户状态 + 助手 + 界面） |
+| 语料 | 采集的微博 UGC（**仅本地私有**） | **自有 content**（可对外）+ 官方商品页 + Lolibrary 档案缓存 |
+| 索引 | `data/index/` | `data/kbindex/` + `data/lolibrary/` |
 
 两条硬纪律：
 
-* **自有内容与微博语料永不混用。** 上游语料是他人 UGC，授权范围只到个人研究；而对外的页面必须只吃自有内容。管线是通用的，换数据源即可。
+* **微博 UGC 与自有内容永不混用。** 上游语料是他人 UGC，授权范围只到个人研究；本应用的问答与推荐内容只吃 `content/`。Lolibrary 档案只作为身份标注显示（品牌 / 商品编号 / 历史原价 / 档案链接），不写进问答索引，也不替代官网价格与购买链接。
 * **本服务不持有任何微博 Cookie。** 上游 `.env` 里有 `WEIBO_COOKIE`，这里构造上游 `Settings` 时显式传 `_env_file=None`，从根上不读它。
+
+## 数据源与边界
+
+| 数据 | 来源 | 存放 | 权威用途 |
+|---|---|---|---|
+| 知识库 | 自己整理 | `content/kb/` | 术语 / 洗护 / 尺码解释 |
+| 上新 | 官网 + 人工确认 | `content/newarrivals/` | 当前价格、购买链接、发售日 |
+| 商品级尺寸 | 官网商品页 | `newarrivals/<id>.json` 的 `size` | 合身判断 |
+| 品牌级尺码表 | 官方分码表 | `content/size/` | 仅 `kind: size_chart` 的品牌 |
+| Lolibrary 档案 | 档案馆 | `data/lolibrary/catalog.jsonl` | 品牌 / 分类 / 商品编号 / 历史原价 |
+| 微博 UGC | 上游采集 | 上游 `data/` | 仅本地研究，不进本应用 |
+
+**推荐页的当前价格和购买链接只信官网**；Lolibrary 只补“这件是什么”，不覆盖价格/链接；微博 UGC 不参与本应用的问答。
 
 ---
 
@@ -49,7 +75,7 @@ python -m app.main            # http://127.0.0.1:8787
 
 浏览器打开 `http://127.0.0.1:8787`。手机访问见下面「手机怎么用」。
 
-**没有 `LLM_API_KEY` 也能完整跑通**：问答会自动退化为「原文摘录 + `[n]` 引用」，和上游同一套兜底逻辑。这样第一次出问题时，能立刻分清是**检索坏了**还是**生成坏了**。
+**没有 `LLM_API_KEY` 时，知识页问答会退化为「原文摘录 + `[n]` 引用」**，和上游同一套兜底逻辑；这样第一次出问题能分清是**检索坏了**还是**生成坏了**。但**助手 `/api/chat` 需要模型**：没配 key 时 `/api/chat/status` 会明确禁用，聊天接口返回 503。
 
 ### 检索默认只展示最相关的一条
 
@@ -71,7 +97,7 @@ lo-life/
 │   ├── config.py          应用配置（DATA_DIR / CONTENT_DIR 都可改）
 │   ├── bridge.py          ★ 与上游管线的桥：装 sys.path、建 Settings、query_kb
 │   ├── auth.py            密码哈希（scrypt）+ 会话令牌 + 登录依赖
-│   ├── db.py              SQLite：users / sessions / preferences（按轴存）
+│   ├── db.py              SQLite：users / sessions / preferences / body_profile
 │   ├── domain/            ★ 纯逻辑，全部可单测
 │   │   ├── axes.py          ★ 偏好轴声明表（店家/风格/款式…加轴只改这里）
 │   │   ├── preferences.py   轴的可选项、校验、人话描述
@@ -80,15 +106,19 @@ lo-life/
 │   │   ├── shops.py         店铺登记表：brand → 店铺页 / 取图入口
 │   │   ├── images.py        ★ 从 HTML 抽商品图候选 + 域名策略（纯函数）
 │   │   ├── ingest.py        ★ 离线入库校验：引文 / 状态 / 审批（纯函数）
+│   │   ├── catalog.py       Lolibrary 档案匹配（商品编号 / 标题）
+│   │   ├── baby_catalog.py  Baby products.json → 待确认草稿
 │   │   ├── urls.py          出口链接白名单（挡 javascript:/data:）
 │   │   ├── size.py          尺码查表
 │   │   └── care.py          洗护规则匹配
 │   ├── main.py            FastAPI 入口（API 先注册，静态目录最后挂）
 │   ├── agent/             ★ 只读工具 + 单 planner 循环 + 并行取证（loop/tools/planner/trace/writer）
-│   ├── routers/           auth / feed / kb / tools / data
+│   ├── services/          ★ 联网与写盘：取图 / 离线入库管线 / 档案缓存
+│   ├── routers/           auth / feed / kb / chat / profile / tools / data
 │   └── static/            index.html + app.js + style.css + manifest + sw.js
 ├── content/               ★★ 内容，进 git —— 产品真正的价值
 │   ├── newarrivals/       ★ 上新条目（一条一个 JSON，带来源）
+│   ├── _drafts/           待确认草稿（scan_baby / ingest_newarrivals 写这里）
 │   ├── kb/                知识库源文件（纯文本 md）
 │   ├── size/              品牌尺码表（JSON，含模板与录入说明）
 │   ├── shops/             店铺登记表（brand → 店铺页 / 取图入口）
@@ -98,7 +128,7 @@ lo-life/
 │   ├── media/             图片（上传的 + 取图脚本下载的）
 │   ├── ingest/            离线入库：raw / drafts / rejected / runs.jsonl
 │   ├── lolibrary/         Lolibrary 档案缓存（catalog.jsonl，可重建）
-│   └── app.db             账号、关注、偏好
+│   └── app.db             账号、会话、偏好、身材
 ├── scripts/
 │   ├── ingest_kb.py       md → posts.jsonl（喂给上游）
 │   ├── build_kb_index.py  调上游 build_index（增量/全量）
@@ -109,7 +139,7 @@ lo-life/
 │   ├── import_lolibrary.py ★ Lolibrary 档案 → data/lolibrary/catalog.jsonl
 │   ├── make_icons.py      生成 PWA 图标
 │   └── smoke.py           端到端冒烟（对运行中的服务）
-└── tests/                 pytest（上新 / 搜索 / 取图 / 尺码 / 洗护 / 数据层 / 接口）
+└── tests/                 pytest（认证 / 偏好 / 上新 / 搜索 / 推荐 / 取图 / 尺码 / 洗护 / 草稿 / 档案 / agent / 接口）
 ```
 
 > **content/ 与 data/ 的分界是有意的。** 内容是产品价值，必须进 git、可评审、可回溯；用户状态与索引只在本地。
@@ -531,11 +561,24 @@ RAG 在这里唯一站得住的位置是**解释背景**：你偏好 JSK，卡�
 
 唯一的"专家"是 `item_profile`：给它一个系列名，它把**条目事实、合身判断、商品/店铺链接、相关术语**四路取证并发跑完（固定小 DAG，`ThreadPoolExecutor`），合并成一份档案交给 planner。它刻意不是第二个对话 agent——没有独立提示词、没有循环、没有重试；知识库没建时只是少一路证据，不影响其余结论。这样 planner 一次调用就能回答"这件我穿得上吗、多少钱、哪儿买"，而不是连查三次。
 
+### 六个只读工具
+
+| 工具 | 回答什么 | 数据源 |
+|---|---|---|
+| `search_feed` | 有没有这类上新、多少钱、什么时候发 | `content/newarrivals` + 可选的 Lolibrary 档案 |
+| `search_kb` | 术语、常识、洗护 / 尺码解释 | `content/kb` → `data/kbindex` |
+| `care_advice` | 能不能机洗、怎么洗 | `content/care/rules.json` |
+| `size_recommend` | 某品牌某品类穿几码 | `content/size/*.json`（仅 `size_chart`） |
+| `check_fit` | 这一件我穿得上吗 | `newarrivals` 的 `size` + 用户身材 |
+| `item_profile` | 一件商品的完整档案 | 并行组合：条目事实 / 合身 / 链接 / 术语 |
+
+写入类操作不在助手层：录上新走 `scan_baby.py` / `ingest_newarrivals.py`，确认后才进 `content/`。轨迹看 `GET /api/chat/runs`，流式回答是 `POST /api/chat/stream`。
+
 ---
 
 ## 账号与偏好
 
-浏览（推荐、知识、尺码、洗护）**不需要登录**；保存偏好需要——偏好是跟着账号走的，做成多账号才有意义，否则"登录"只是装饰。
+浏览（推荐、助手、尺码、洗护）**不需要登录**；保存偏好需要——偏好是跟着账号走的，做成多账号才有意义，否则"登录"只是装饰。
 
 | 接口 | 说明 |
 |---|---|
@@ -543,7 +586,7 @@ RAG 在这里唯一站得住的位置是**解释背景**：你偏好 JSK，卡�
 | `POST /api/auth/login` | 登录，返回新令牌 |
 | `POST /api/auth/logout` | 吊销当前令牌 |
 | `GET /api/auth/me` | 未登录返回 `200 + user: null`（前端少一个分支） |
-| `DELETE /api/auth/me` | 注销账号，连同会话/偏好一起删（**真删**，同名可重新注册） |
+| `DELETE /api/auth/me` | 注销账号，连同会话/偏好/身材一起删（**真删**，同名可重新注册） |
 | `GET /api/preferences/options` | 轴的元数据 + 每个轴的可选标签（**不需要登录**，前端要先能渲染） |
 | `GET/PUT /api/preferences` | 读/写偏好（写操作需要登录） |
 | `GET /api/feed` | 推荐（匿名可用，带上令牌就按偏好排序）。支持 `q` / `sort` / `price_min` / `price_max`，响应里带 `size_charts` |
@@ -762,7 +805,7 @@ tailscale serve https / http://localhost:8787
 
 ## 数据与备份
 
-用户状态只有一份：**关注列表**（`data/app.db`）。内容全在 `content/` 里，本来就在 git 中。
+用户状态在 `data/app.db`：账号、会话、偏好、身材参数。内容在 `content/` 里，本来就在 git 中；Lolibrary 档案缓存 `data/lolibrary/` 可重建，不进备份。
 
 * 界面：「我的」→「导出备份 zip」（未登录时不显示按钮）
 * 接口：`GET /api/export`，**必须登录**
@@ -771,7 +814,11 @@ tailscale serve https / http://localhost:8787
 所以它不能是匿名接口。前端导出也要用 `fetch` 带 `Authorization` 头再走 blob 下载，
 不能直接 `location.href` ——那样发不出 Bearer 头。
 
-zip 里是 `app.db`（用 SQLite 的 `backup()` 复制，不是直接拷文件——库开着 WAL，直接拷可能拿到缺最新事务的半成品）、`media/`、`content/`（上新 + 知识库 + 尺码表 + 洗护规则）、`MANIFEST.json`。
+zip 里是 `app.db`（用 SQLite 的 `backup()` 复制，不是直接拷文件——库开着 WAL，直接拷可能拿到缺最新事务的半成品）、`media/`、`content/` 的部分目录（上新 + 知识库 + 尺码表 + 洗护规则）、`MANIFEST.json`。
+
+**草稿不在备份包里**：`content/_drafts/`（scan_baby 的草稿）与 `data/ingest/drafts|rejected`（ingest_newarrivals 的草稿）都不进 zip；只有 `--approve` 后才进 `content/newarrivals/`。如果还没确认，请先确认，或单独备份这两个目录。
+
+`content/shops/` 目前也不在 zip 里（它同样在 git 中）；如果要独立恢复店铺页链接，请从仓库拿回或单独备份。
 
 恢复：把 `app.db` 与 `media/` 放回 `data/`，`content/` 放回项目根。
 
@@ -786,7 +833,7 @@ python scripts/smoke.py        # 63 项端到端，需要服务在跑
 ```
 
 * `pytest` 用 `tests/.data` 作为数据目录（`tests/conftest.py` 在导入前设 `DATA_DIR`），**绝不碰真实 `data/`**。
-* `smoke.py` 会注册一个临时账号（`smoke-xxxx`）、用完**注销**，连带它的关注与偏好一起消失；如果本机有 `orphan_follows`（升级前待认领的旧关注），它会跳过账号部分，避免把旧关注认领后删掉。
+* `smoke.py` 会注册一个临时账号（`smoke-xxxx`）、用完**注销**，连带它的偏好与身材数据一起消失；如果本机有 `orphan_follows`（升级前遗留的无归属店家），它会跳过账号部分，避免把旧数据认领后删掉。
 * 「知识库外的问题必须返回 `count=0`」是断言项，不是失败——拒答是设计内的行为。
 * **API 测试不断言依赖"今天"的数字**：新鲜度随日期变，写死"7 天内必须有 N 条"过两周就红。时间逻辑在 `test_newarrivals.py` 里注入 `today` 测。
 
@@ -800,7 +847,7 @@ python scripts/smoke.py        # 63 项端到端，需要服务在跑
 |---|---|
 | 拒答文案带「语料」二字 | 用的是上游 `NO_CONTEXT_REPLY`（"请换一种问法，或先补充语料后重建索引"）。对终端用户应该说「知识库」 |
 | 上新主要靠手工录入 | Baby 已有 `scan_baby.py` 生成官方草稿，但仍需人工确认；其他品牌仍是手工录入 |
-| 推荐只有三个轴 | 没有点击行为，做不出个性化。轴是可扩展的（加一条 `Axis` 即可），但"更准"得先有埋点 |
+| 偏好只有四个轴（店家 / 风格 / 自定义标签 / 款式） | 没有点击行为，做不出个性化。轴是可扩展的（加一条 `Axis` 即可），但"更准"得先有埋点 |
 | 标签组不支持搜索 | 店家只有几个时没问题；到几十个就需要搜索或分组 |
 | 自定义标签匹配很朴素 | 纯子串：`缎` 会命中 `缎带`，没有同义词、分词、大小写以外的一切归一化 |
 | 搜索不做错字/拼音容错 | 搜「秋日」不会命中「秋天」。条目量小的时候可以忍；上千条就该上 SQLite FTS 而不是硬堆正则 |
@@ -811,7 +858,9 @@ python scripts/smoke.py        # 63 项端到端，需要服务在跑
 | 淘宝店铺页基本抓不动 | 登录墙 + 风控。脚本会明说失败原因；正确的走法是 `--from-html`（浏览器另存页面） |
 | 列表页配对只认系列名 | 系列名多了括号/英文缩写就配不上。宁可留空也不猜——用 `--pick N` 手动指定 |
 | 品牌级尺码表只有测试数据 | AP/Baby 已接官方商品级实测尺寸（`kind: item_level`），但品牌级 S/M/L 表仍需按官方表录入；没有官方来源的品牌不要编数字 |
-| **没有找回密码** | 忘了密码等于这个账号的关注和偏好拿不回来。请存进密码管理器；也可以注册新账号重来 |
+| Lolibrary 只做部分匹配 | 只用商品编号 / 归一化标题匹配，没有模糊匹配；`archived_at` 是收录日期不是发售日，原价是历史原价不是现价 |
+| 草稿不在备份里 | `content/_drafts/` 与 `data/ingest/drafts` / `rejected` 不进备份 zip；确认后进 `content/newarrivals/`，或单独备份这两个目录 |
+| **没有找回密码** | 忘了密码等于这个账号的偏好和身材数据拿不回来。请存进密码管理器；也可以注册新账号重来 |
 | **没有登录失败限速** | 本地单机场景可以接受；一旦暴露到公网必须先加 |
 | 明文 HTTP 下令牌可嗅探 | 局域网/公网访问请走 Tailscale（加密隧道），不要裸奔 |
 | 洗护规则偏少 | 目前 13 条。长尾组合会走 `known: false` |
@@ -823,4 +872,11 @@ python scripts/smoke.py        # 63 项端到端，需要服务在跑
 
 本仓库通过 `sys.path` 导入 `lolita-rag` 的 `src` 包，**不复制它的代码**：那些阈值（`MIN_VECTOR_SCORE=0.44`、`DISTINCTIVE_DF_RATIO=0.10` 等）都是在真实数据上标定出来的，复制一份就等于把标定依据一起丢掉。
 
-上游更新后这里自动生效；唯一需要跟着改的是它那两个公开接口的形状：`load_retriever()` 与 `verify_and_degrade()`。
+上游更新后这里自动生效，但**实际依赖的接口不止两个**：
+
+- 管线装载/状态：`load_retriever()`、`read_manifest()`；
+- 问答：`hits_to_dicts()`、`Generator.answer()`、`verify_and_degrade()`、`tokenize()`；
+- 配置：`src.config.Settings`；
+- 档案采集：`src.crawler.lolibrary` 的解析函数与 `src.crawler.brand_sites.http_fetcher`（`scripts/import_lolibrary.py` 用）。
+
+上游改这些形状时这里要跟着改；阈值、闸门参数仍然只在上游维护。

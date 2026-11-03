@@ -189,7 +189,11 @@ def _search_feed(args: SearchFeedArgs, ctx: Context) -> dict:
         return {
             "ok": True,
             "empty": True,
-            "summary": "没有匹配的上新（价格/风格/款式/关键词任一条件都可能过严）。",
+            "summary": (
+                "没有匹配的上新（价格/风格/款式/关键词任一条件都可能过严）。"
+                "如果用户问的是洗护/术语而不是找商品，改用 care_advice 或 search_kb，"
+                "不要直接拒答。"
+            ),
             "evidence": [],
             "filters": args.model_dump(),
         }
@@ -251,7 +255,13 @@ def _search_kb(args: SearchKbArgs, ctx: Context) -> dict:
 class CareArgs(BaseModel):
     materials: list[str] = Field(default_factory=list, description="面料，如 蕾丝/真丝/雪纺")
     crafts: list[str] = Field(default_factory=list, description="工艺，如 烫金/亮片/印花")
-    notes: list[str] = Field(default_factory=list, description="情况，如 只能干洗/深色易掉色")
+    notes: list[str] = Field(
+        default_factory=list,
+        description=(
+            "情况，优先用标准标签：只能干洗 / 有钢圈裙撑 / 深色易掉色 / "
+            "红色/酒红易掉色 / 白色/米白易泛黄 / 彩色/拼色易串色 / 首次洗"
+        ),
+    )
 
 
 def _care_advice(args: CareArgs, ctx: Context) -> dict:
@@ -574,7 +584,11 @@ def _item_profile(args: ItemProfileArgs, ctx: Context) -> dict:
             }
         return {
             "ok": True, "empty": False, "status": "no_data",
-            "summary": f"没找到「{args.entry}」这条上新。",
+            "summary": (
+                f"没找到「{args.entry}」这条上新。"
+                "如果用户问的是洗护/术语，不要停：改用 care_advice（按问题里的"
+                "面料/颜色给通用建议）或 search_kb。"
+            ),
             "evidence": [{
                 "ref": "profile:none",
                 "title": "没有匹配的上新条目",
@@ -642,7 +656,10 @@ TOOLS: dict[str, Tool] = {
         ),
         Tool(
             name="care_advice",
-            description="按面料/工艺/情况给出洗护结论（能不能机洗、怎么洗）。确定性规则，不要自己推断。",
+            description=(
+                "按面料/工艺/情况给出洗护结论（能不能机洗、怎么洗）。确定性规则，不要自己推断。"
+                "商品名查不到时，仍可按问题里的材质/颜色给通用建议，不要直接拒答。"
+            ),
             args_model=CareArgs,
             handler=_care_advice,
         ),
