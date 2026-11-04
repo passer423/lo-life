@@ -35,7 +35,7 @@ def _font(size: int):
     return ImageFont.load_default()
 
 
-def render(size: int, *, maskable: bool) -> "object":
+def render(size: int, *, maskable: bool) -> object:
     from PIL import Image, ImageDraw
 
     image = Image.new("RGBA", (size, size), BG + (255,))

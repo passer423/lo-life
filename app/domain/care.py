@@ -12,9 +12,10 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 SEVERITY_ORDER = {"forbid": 0, "warn": 1, "tip": 2}
 SEVERITY_LABEL = {"forbid": "禁止项", "warn": "注意事项", "tip": "建议"}

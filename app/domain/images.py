@@ -478,10 +478,9 @@ def policy_violation(url: str) -> str:
             "（那条路完全不联网）。"
         )
 
-    if any(host == base or host.endswith("." + base) for base in _QUERY_FORBIDDEN_HOSTS):
-        if parsed.query:
-            return (
-                "淘宝/天猫的 robots.txt 是 `Disallow: /*?*`：带查询参数的地址一律不抓。"
-                "请换成不带参数的店铺页或商品页地址。"
-            )
+    if any(host == base or host.endswith("." + base) for base in _QUERY_FORBIDDEN_HOSTS) and parsed.query:
+        return (
+            "淘宝/天猫的 robots.txt 是 `Disallow: /*?*`：带查询参数的地址一律不抓。"
+            "请换成不带参数的店铺页或商品页地址。"
+        )
     return ""

@@ -20,9 +20,10 @@ for candidate in (ROOT, SCRIPTS):
     if str(candidate) not in sys.path:
         sys.path.insert(0, str(candidate))
 
-from app import bridge                      # noqa: E402
-from app.config import AppSettings          # noqa: E402
-from ingest_kb import ingest, split_front_matter   # noqa: E402
+from ingest_kb import ingest, split_front_matter  # noqa: E402
+
+from app import bridge  # noqa: E402
+from app.config import AppSettings  # noqa: E402
 
 SAMPLE = """id: term-x
 title: 什么是 X

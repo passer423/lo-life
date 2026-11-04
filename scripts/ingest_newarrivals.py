@@ -33,6 +33,7 @@ python scripts/ingest_newarrivals.py --approve data/ingest/drafts/xxx.json
 from __future__ import annotations
 
 import argparse
+import contextlib
 import sys
 from pathlib import Path
 
@@ -94,10 +95,8 @@ def show_approve(result: dict) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     for stream in (sys.stdout, sys.stderr):
-        try:
+        with contextlib.suppress(AttributeError, ValueError):
             stream.reconfigure(errors="replace")
-        except (AttributeError, ValueError):
-            pass
 
     parser = argparse.ArgumentParser(
         description="离线入库：页面 → 草稿 → 人工审批",

@@ -114,7 +114,7 @@ def post_png(path: str, filename: str = "smoke.png") -> tuple[int, dict]:
         f"--{BOUNDARY}\r\n"
         f'Content-Disposition: form-data; name="file"; filename="{filename}"\r\n'
         f"Content-Type: image/png\r\n\r\n"
-    ).encode("utf-8") + png + f"\r\n--{BOUNDARY}--\r\n".encode("utf-8")
+    ).encode() + png + f"\r\n--{BOUNDARY}--\r\n".encode()
     status, payload, _ = _send(path, method="POST", data=body,
                                content_type=f"multipart/form-data; boundary={BOUNDARY}")
     return status, _json(payload)
@@ -123,10 +123,10 @@ def post_png(path: str, filename: str = "smoke.png") -> tuple[int, dict]:
 def citations_valid(payload: dict) -> bool:
     """``[n]`` 必须落在 1..命中条数 内——上游 verify 的核心判据，这里独立复核。"""
     count = int(payload.get("count") or 0)
-    for index in re.findall(r"\[(\d+)\]", str(payload.get("answer", ""))):
-        if not 1 <= int(index) <= count:
-            return False
-    return True
+    return all(
+        1 <= int(index) <= count
+        for index in re.findall(r"\[(\d+)\]", str(payload.get("answer", "")))
+    )
 
 
 def main() -> int:

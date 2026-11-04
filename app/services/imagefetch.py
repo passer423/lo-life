@@ -69,7 +69,7 @@ def ssl_context() -> ssl.SSLContext:
     为了省一个 bundle 而拆掉 TLS 没有道理。
     """
     try:
-        import certifi                                     # noqa: PLC0415 - 可选依赖
+        import certifi  # noqa: PLC0415 - 可选依赖
 
         return ssl.create_default_context(cafile=certifi.where())
     except Exception:                                       # noqa: BLE001 - 没装就退回系统默认

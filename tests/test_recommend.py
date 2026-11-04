@@ -32,17 +32,17 @@ def token(client) -> str:
 
 
 def entry(**overrides) -> na.NewArrival:
-    base = dict(
-        id="e1",
-        brand="baby",
-        brand_name="Baby",
-        series="Dark Night Sweets柄 ジャンパースカートII",
-        release_date="2026-10-29",
-        items=["JSK"],
-        styles=["甜系"],
-        price_range="41800",
-        currency="JPY",
-    )
+    base = {
+        "id": "e1",
+        "brand": "baby",
+        "brand_name": "Baby",
+        "series": "Dark Night Sweets柄 ジャンパースカートII",
+        "release_date": "2026-10-29",
+        "items": ["JSK"],
+        "styles": ["甜系"],
+        "price_range": "41800",
+        "currency": "JPY",
+    }
     base.update(overrides)
     return na.NewArrival(**base)
 

@@ -23,8 +23,6 @@
 
 from __future__ import annotations
 
-from typing import Iterable
-
 from app.domain import size
 
 # 允许范围。宽到能容纳真实身材，窄到能挡住"手滑多打一位"：

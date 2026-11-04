@@ -22,9 +22,10 @@ for candidate in (ROOT, Path(__file__).resolve().parent):
     if str(candidate) not in sys.path:
         sys.path.insert(0, str(candidate))
 
+from ingest_kb import ingest  # noqa: E402
+
 from app import bridge  # noqa: E402
 from app.config import settings  # noqa: E402
-from ingest_kb import ingest  # noqa: E402
 
 
 def notify_server(port: int) -> None:

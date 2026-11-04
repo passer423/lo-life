@@ -26,11 +26,12 @@ import logging
 import os
 import re
 import time
+from collections.abc import Callable
 from datetime import date, datetime
 from pathlib import Path
-from typing import Callable
 
-from app.config import AppSettings, settings as default_settings
+from app.config import AppSettings
+from app.config import settings as default_settings
 from app.domain import ingest as ingest_domain
 from app.domain import newarrivals as na
 from app.domain import shops as shop_table
@@ -38,6 +39,8 @@ from app.services import imagefetch
 from app.services.ingest_extract import (
     ExtractFailed,
     ExtractUnavailable,
+)
+from app.services.ingest_extract import (
     extract as llm_extract,
 )
 

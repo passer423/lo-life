@@ -32,7 +32,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from app.config import AppSettings, settings as default_settings
+from app.config import AppSettings
+from app.config import settings as default_settings
 
 logger = logging.getLogger(__name__)
 
@@ -329,7 +330,7 @@ def search_kb(text: str, app: AppSettings | None = None, *, top_k: int | None = 
         return []
 
     bundle = _ensure_loaded(app)
-    from src.pipeline.ask import hits_to_dicts   # noqa: PLC0415 - 必须先装好 sys.path
+    from src.pipeline.ask import hits_to_dicts  # noqa: PLC0415 - 必须先装好 sys.path
 
     return hits_to_dicts(_search_hits(text, bundle, top_k or 1))
 

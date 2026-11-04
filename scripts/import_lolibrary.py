@@ -117,8 +117,8 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         upstream = bridge.upstream_settings(settings)
-        from src.crawler.lolibrary import ITEM_URL, SEARCH_URL, parse_lolibrary_item, parse_lolibrary_list
         from src.crawler.brand_sites import BrandFetchError, http_fetcher
+        from src.crawler.lolibrary import ITEM_URL, SEARCH_URL, parse_lolibrary_item, parse_lolibrary_list
     except Exception as exc:  # noqa: BLE001
         print(f"上游不可用：{type(exc).__name__}: {exc}")
         return 1

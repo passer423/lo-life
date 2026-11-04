@@ -19,8 +19,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 # 自定义标签的边界。太长的词不可能出现在系列名里，条数不设上限则存储和排序都会失控。
 CUSTOM_MAX_LEN = 20

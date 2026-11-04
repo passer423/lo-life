@@ -171,7 +171,7 @@ def test_search_feed_no_match_is_empty_not_error(feed_ctx):
 
 def test_search_feed_price_filter(feed_ctx):
     result = TOOLS["search_feed"].run({"price_min": 600}, feed_ctx)
-    refs = set(item["ref"] for item in result["evidence"])
+    refs = {item["ref"] for item in result["evidence"]}
     assert refs == {"mid", "pricey"}        # 100 的被排除
 
 

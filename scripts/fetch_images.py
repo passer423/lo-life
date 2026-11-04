@@ -34,6 +34,7 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import sys
 from pathlib import Path
 
@@ -146,10 +147,8 @@ def main() -> int:
     # print 就会 UnicodeEncodeError 把整个脚本崩掉。这里保留原编码（中文照常显示），
     # 只把编不出来的字符换成 ?，绝不让"打印失败"变成一个失败原因。
     for stream in (sys.stdout, sys.stderr):
-        try:
+        with contextlib.suppress(AttributeError, ValueError):
             stream.reconfigure(errors="replace")
-        except (AttributeError, ValueError):
-            pass
 
     parser = argparse.ArgumentParser(
         description="按品牌/条目取图，默认只打印候选（dry-run）",

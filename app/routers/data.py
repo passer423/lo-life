@@ -24,7 +24,7 @@ from starlette.background import BackgroundTask
 
 from app import __version__, auth, bridge, db
 from app.config import settings
-from app.domain import images, newarrivals
+from app.domain import newarrivals
 from app.domain import shops as shop_table
 from app.services import imagefetch
 from app.services.imagefetch import FetchError
