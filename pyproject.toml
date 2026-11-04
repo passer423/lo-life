@@ -12,7 +12,8 @@ exclude = [".venv", "data", "tests/.data", ".pytest-tmp"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "C4", "SIM"]
-ignore = ["E501"]
+# B008 是 FastAPI 依赖注入的惯用法（Depends() 等作为参数默认值），属规则误伤，不是代码问题。
+ignore = ["E501", "B008"]
 
 [tool.ruff.lint.per-file-ignores]
 "scripts/*.py" = ["E402"]   # 脚本要先改 sys.path 再 import
