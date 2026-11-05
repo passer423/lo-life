@@ -18,13 +18,15 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 from app.domain import catalog as catalog_domain
-from app.domain import images, price, shops as shop_table, urls
+from app.domain import images, price, urls
+from app.domain import shops as shop_table
 from app.domain.axes import AXES, entry_haystack
 
 FRESH_DAYS = 7          # 这个天数以内标「新」
@@ -242,11 +244,8 @@ def feed(
         if not price.within(bounds, price_min=price_min, price_max=price_max):
             continue
 
-        if age < 0:
-            # 发布日期在未来：可能是预录入。标出来，不当成"很新"
-            freshness = 0.0
-        else:
-            freshness = max(0.0, (DECAY_DAYS - age) / DECAY_DAYS) * DECAY_DAYS
+        # 发布日期在未来：可能是预录入。标出来，不当成"很新"
+        freshness = 0.0 if age < 0 else max(0.0, (DECAY_DAYS - age) / DECAY_DAYS) * DECAY_DAYS
 
         score = freshness
         reasons: list[str] = []

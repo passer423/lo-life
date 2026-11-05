@@ -20,20 +20,20 @@ from app.domain.newarrivals import NewArrival
 
 
 def entry(**overrides) -> NewArrival:
-    base = dict(
-        id="e1",
-        brand="baby",
-        brand_name="Baby",
-        series="秋日私语",
-        release_date="2026-10-20",
-        price_range="295 - 880",
-        items=["JSK"],
-        styles=["甜系"],
-        image="",
-        link="",
-        note="",
-        source="测试",
-    )
+    base = {
+        "id": "e1",
+        "brand": "baby",
+        "brand_name": "Baby",
+        "series": "秋日私语",
+        "release_date": "2026-10-20",
+        "price_range": "295 - 880",
+        "items": ["JSK"],
+        "styles": ["甜系"],
+        "image": "",
+        "link": "",
+        "note": "",
+        "source": "测试",
+    }
     base.update(overrides)
     return NewArrival(**base)
 

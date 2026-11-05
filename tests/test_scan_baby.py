@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import json
 
-import pytest
-
 DRAFT = {
     "id": "2026-11-baby-test-handle",
     "brand": "baby",

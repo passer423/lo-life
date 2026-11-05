@@ -15,8 +15,9 @@ from __future__ import annotations
 
 import html as html_lib
 import re
+from collections.abc import Iterable
 from datetime import date, timedelta
-from typing import Any, Iterable
+from typing import Any
 
 from app.domain import garment
 
@@ -100,10 +101,9 @@ def infer_items(title: str, product_type: str = "") -> list[str]:
     haystack = f"{title} {product_type}".lower()
     for item, keys in _ITEM_PATTERNS:
         for key in keys:
-            if key in ("op", "sk", "kc", "bl"):
-                # 避免 "op" 命中 "top"/"shop" 这类英文子串
-                if not re.search(rf"(?<![a-z]){key}(?![a-z])", haystack):
-                    continue
+            # 避免 "op" 命中 "top"/"shop" 这类英文子串
+            if key in ("op", "sk", "kc", "bl") and not re.search(rf"(?<![a-z]){key}(?![a-z])", haystack):
+                continue
             if key in haystack:
                 return [item]
     return []

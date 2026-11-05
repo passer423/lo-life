@@ -23,7 +23,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from app import bridge  # noqa: E402
-from app.config import AppSettings, settings as default_settings  # noqa: E402
+from app.config import AppSettings  # noqa: E402
+from app.config import settings as default_settings
 
 
 def split_front_matter(text: str) -> tuple[dict[str, str], str]:

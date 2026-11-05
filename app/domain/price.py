@@ -75,6 +75,4 @@ def within(
     low, high = bounds
     if price_min is not None and high < price_min:
         return False
-    if price_max is not None and low > price_max:
-        return False
-    return True
+    return price_max is None or low <= price_max

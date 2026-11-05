@@ -18,7 +18,9 @@ from pathlib import Path
 
 import pytest
 
-from app.domain import images, newarrivals as na, shops as shop_table
+from app.domain import images
+from app.domain import newarrivals as na
+from app.domain import shops as shop_table
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -433,11 +435,11 @@ def test_download_and_save_roundtrip(workdir):
     网络与写盘的实现在 `app/services/imagefetch.py`——脚本和接口共用同一份，
     所以这里测的就是生产路径。
     """
-    from app.services import imagefetch
-
     import functools
     import http.server
     import threading
+
+    from app.services import imagefetch
 
     (workdir / "cover.png").write_bytes(PNG_1X1)
 

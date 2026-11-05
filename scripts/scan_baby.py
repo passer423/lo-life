@@ -43,7 +43,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from app.config import settings  # noqa: E402
-from app.domain import baby_catalog, newarrivals as na  # noqa: E402
+from app.domain import baby_catalog  # noqa: E402
+from app.domain import newarrivals as na
 from app.services import imagefetch  # noqa: E402
 from app.services.imagefetch import FetchError  # noqa: E402
 

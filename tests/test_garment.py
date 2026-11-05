@@ -16,9 +16,8 @@ import json
 
 import pytest
 
-from app.domain import garment
+from app.domain import garment, size
 from app.domain import newarrivals as na
-from app.domain import size
 
 AP_LINE = "・着丈:約89㎝ ・バスト:約91～101㎝ ・ウエスト切替位置:約74～86㎝ ・身丈:BNP～約35cm"
 BABY_LINE = "サイズ 着丈：約99～104cm バスト：約90～99cm ウエスト：約74～85cm"

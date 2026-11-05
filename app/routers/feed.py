@@ -28,9 +28,9 @@ from app.domain import newarrivals as na
 from app.domain import preferences as pref
 from app.domain import recommend as rec
 from app.domain import shops as shop_table
-from app.services import catalog_store
 from app.domain import size
 from app.domain.axes import AXES
+from app.services import catalog_store
 
 router = APIRouter(prefix="/api", tags=["feed"])
 

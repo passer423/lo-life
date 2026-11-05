@@ -13,9 +13,10 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 # 各维度的默认富余量（厘米）。裙子胸腰需要放量，肩宽几乎不放——肩宽放多了会塌肩。
 DEFAULT_EASE: dict[str, float] = {

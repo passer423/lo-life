@@ -16,16 +16,19 @@ from __future__ import annotations
 
 import dataclasses
 import logging
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
-from typing import Callable
 
 from pydantic import BaseModel, Field, ValidationError
 
 from app import bridge, db
-from app.config import AppSettings, settings as default_settings
+from app.config import AppSettings
+from app.config import settings as default_settings
 from app.domain import body as body_mod
-from app.domain import care, garment, newarrivals as na, shops as shop_table, size
+from app.domain import care, garment, size
+from app.domain import newarrivals as na
+from app.domain import shops as shop_table
 from app.services import catalog_store
 
 logger = logging.getLogger(__name__)

@@ -18,7 +18,8 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
-from app.config import AppSettings, settings as default_settings
+from app.config import AppSettings
+from app.config import settings as default_settings
 
 logger = logging.getLogger(__name__)
 

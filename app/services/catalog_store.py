@@ -12,7 +12,8 @@ import json
 import threading
 from typing import Any
 
-from app.config import AppSettings, settings as default_settings
+from app.config import AppSettings
+from app.config import settings as default_settings
 from app.domain import catalog as catalog_domain
 
 _lock = threading.Lock()

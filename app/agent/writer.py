@@ -21,7 +21,7 @@ planner 的 final 动作如果**自己带了答案**，就直接用（测试里�
 from __future__ import annotations
 
 import logging
-from typing import Iterator
+from collections.abc import Iterator
 
 from app.config import AppSettings
 

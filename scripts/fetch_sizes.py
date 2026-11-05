@@ -241,7 +241,7 @@ def main(argv: list[str] | None = None) -> int:
             continue
         path, raw = found
         if entry.size and not args.overwrite:
-            print(f"      已有 size，未加 --overwrite，跳过写回")
+            print("      已有 size，未加 --overwrite，跳过写回")
             continue
 
         raw["size"] = size

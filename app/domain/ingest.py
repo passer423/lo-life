@@ -20,9 +20,10 @@ from __future__ import annotations
 import hashlib
 import html as html_lib
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import date
-from typing import Any, Iterable
+from typing import Any
 from urllib.parse import urljoin
 
 from app.domain import urls
